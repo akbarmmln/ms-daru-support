@@ -27,7 +27,7 @@ async function updateHealthResponse() {
     const isReady = health.serverOk && health.dbOk;
 
     if (isReady) {
-        logger.debug('MS-DARU-SUPPORT] - Ready to serve traffic');
+        logger.debug('[MS-DARU-SUPPORT] - Ready to serve traffic');
         return 200;
     } else {
         logger.error('[MS-DARU-SUPPORT] - Unable to serve traffic');
