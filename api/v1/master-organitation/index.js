@@ -2,6 +2,6 @@ const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
 
-router.post('/sample', controller.getSample);
+router.get('/:id', controller.getDataMaster);
 
 module.exports = router;
