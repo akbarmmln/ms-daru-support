@@ -28,7 +28,7 @@ exports.getDataMaster = async function (req, res) {
 
     return res.status(200).json(rsmg('000000', dataMaster));
   } catch (e) {
-    logger.error('error GET /api/v1/master-organitation/:id...', e);
+    logger.errorWithContext({ error: e, message: 'error GET /api/v1/master-organitation/:id...'});
     return utils.returnErrorFunction(res, 'error GET /api/v1/master-organitation/:id...', e);
   }
 }
