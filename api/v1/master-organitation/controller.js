@@ -91,7 +91,8 @@ exports.createConfig = async function (req, res) {
       await adrLogging.create({
         id: uuidv4(),
         logging_id: logging_id,
-        aktivitas: `${jenis_iuran} dibuat oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
+        aktivitas: `${jenis_iuran} dibuat oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`,
+        created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
       })
     }
     return res.status(200).json(rsmg('000000'))
@@ -132,7 +133,8 @@ exports.removeConfig = async function (req, res) {
     await adrLogging.create({
       id: uuidv4(),
       logging_id: data?.logging_id,
-      aktivitas: `${data?.jenis_iuran} dihapus oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
+      aktivitas: `${data?.jenis_iuran} dihapus oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`,
+      created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
     })
 
     return res.status(200).json(rsmg('000000'))
@@ -179,7 +181,8 @@ exports.statusApproveReject = async function (req, res) {
       await adrLogging.create({
         id: uuidv4(),
         logging_id: data?.logging_id,
-        aktivitas: aktivitas
+        aktivitas: aktivitas,
+        created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
       })
     }
 
