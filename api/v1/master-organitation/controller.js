@@ -125,7 +125,7 @@ exports.removeConfig = async function (req, res) {
       is_deleted: 1,
     }, {
       where: {
-        id: data.id
+        id: data?.id
       }
     })
 

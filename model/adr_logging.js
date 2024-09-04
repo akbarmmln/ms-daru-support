@@ -8,6 +8,7 @@ const adrLogging = dbConnection.define('adr_logging', {
   },
   logging_id: Sequelize.STRING,
   aktivitas: Sequelize.STRING,
+  created_dt: Sequelize.DATE(6),
 }, {
   freezeTableName: true,
   timestamps: false,
