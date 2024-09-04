@@ -12,7 +12,8 @@ const adrCollectionSetup = dbConnection.define('adr_collection_setup', {
   tahun_implementasi: Sequelize.STRING,
   status: Sequelize.INTEGER,
   is_deleted: Sequelize.INTEGER,
-  logging_id: Sequelize.STRING
+  logging_id: Sequelize.STRING,
+  tagihan: Sequelize.DECIMAL,
 }, {
   freezeTableName: true,
   timestamps: false,

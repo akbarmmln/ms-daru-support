@@ -78,7 +78,8 @@ exports.createConfig = async function (req, res) {
       let jenis_iuran = request[i].jenis_iuran;
       let bulan_implementasi = request[i].bulan_implementasi;
       let tahun_implementasi = request[i].tahun_implementasi;
-
+      let tagihan = request[i].tagihan;
+      
       await adrCollectionSetup.create({
         id: jenis_id,
         org_id: org_id,
@@ -87,7 +88,8 @@ exports.createConfig = async function (req, res) {
         tahun_implementasi: tahun_implementasi,
         status: 2,
         is_deleted: 0,
-        logging_id: logging_id
+        logging_id: logging_id,
+        tagihan: tagihan
       })
 
       await adrLogging.create({
