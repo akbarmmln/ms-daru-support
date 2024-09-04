@@ -110,7 +110,8 @@ exports.removeConfig = async function (req, res) {
     const data = await adrCollectionSetup.findOne({
       raw: true,
       where: {
-        id: id
+        id: id,
+        is_deleted: 0
       }
     })
 
