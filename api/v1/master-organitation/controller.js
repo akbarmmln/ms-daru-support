@@ -72,13 +72,14 @@ exports.createConfig = async function (req, res) {
     }
 
     for (let i=0; i<request.length; i++) {
+      let jenis_id = uuidv4();
       let logging_id = uuidv4();
       let jenis_iuran = request[i].jenis_iuran;
       let bulan_implementasi = request[i].bulan_implementasi;
       let tahun_implementasi = request[i].tahun_implementasi;
 
       await adrCollectionSetup.create({
-        id: uuidv4(),
+        id: jenis_id,
         org_id: org_id,
         jenis_iuran: jenis_iuran,
         bulan_implementasi: bulan_implementasi,
@@ -91,7 +92,7 @@ exports.createConfig = async function (req, res) {
       await adrLogging.create({
         id: uuidv4(),
         logging_id: logging_id,
-        aktivitas: `${jenis_iuran} dibuat oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`,
+        aktivitas: `${jenis_iuran}[${jenis_id}] dibuat oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`,
         created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
       })
     }
@@ -134,7 +135,7 @@ exports.removeConfig = async function (req, res) {
     await adrLogging.create({
       id: uuidv4(),
       logging_id: data?.logging_id,
-      aktivitas: `${data?.jenis_iuran} dihapus oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`,
+      aktivitas: `${data?.jenis_iuran}[${data?.id}] dihapus oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`,
       created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
     })
 
@@ -166,9 +167,9 @@ exports.statusApproveReject = async function (req, res) {
       })
 
       if (status == '1') {
-        aktivitas = `${data?.jenis_iuran} disetujui oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
+        aktivitas = `${data?.jenis_iuran}[${data?.id}] disetujui oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
       } else {
-        aktivitas = `${data?.jenis_iuran} tidak disetujui oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
+        aktivitas = `${data?.jenis_iuran}[${data?.id}] tidak disetujui oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
       }
 
       await adrCollectionSetup.update({
