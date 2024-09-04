@@ -44,8 +44,9 @@ exports.getConfig = async function (req, res) {
     const data = await adrCollectionSetup.findAll({
       raw: true,
       where: {
+        is_deleted: 0,
         org_id: org_id,
-        is_deleted: 0
+        tahun_implementasi: formats.getCurrentTimeInJakarta(moment().format(), 'YYYY');
       }
     })
 
