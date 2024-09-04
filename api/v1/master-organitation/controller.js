@@ -54,6 +54,7 @@ exports.getConfig = async function (req, res) {
       throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80001');
     }
 
+    res.header('access-token', req['access-token']);
     return res.status(200).json(rsmg('000000', data))
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error GET /api/v1/master-organitation/config...'});
@@ -96,6 +97,7 @@ exports.createConfig = async function (req, res) {
         created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
       })
     }
+    res.header('access-token', req['access-token']);
     return res.status(200).json(rsmg('000000'))
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/config...' });
@@ -139,6 +141,7 @@ exports.removeConfig = async function (req, res) {
       created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
     })
 
+    res.header('access-token', req['access-token']);
     return res.status(200).json(rsmg('000000'))
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/remove-config...' });
@@ -188,6 +191,7 @@ exports.statusApproveReject = async function (req, res) {
       })
     }
 
+    res.header('access-token', req['access-token']);
     return res.status(200).json(rsmg('000000'))
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/statued-config...' });
