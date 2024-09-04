@@ -46,7 +46,7 @@ exports.getConfig = async function (req, res) {
       where: {
         is_deleted: 0,
         org_id: org_id,
-        tahun_implementasi: formats.getCurrentTimeInJakarta(moment().format(), 'YYYY');
+        tahun_implementasi: formats.getCurrentTimeInJakarta(moment().format(), 'YYYY')
       }
     })
 
