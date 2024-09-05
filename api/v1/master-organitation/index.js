@@ -6,7 +6,7 @@ const utils = require('../../../utils/utils');
 router.post('/config', utils.verifyTokenMs, controller.createConfig);
 router.post('/remove-config', utils.verifyTokenMs, controller.removeConfig);
 router.post('/statued-config', utils.verifyTokenMs, controller.statusApproveReject);
-router.get('/config', utils.verifyTokenMs, controller.getConfig);
+router.post('/config', utils.verifyTokenMs, controller.getConfig);
 
 router.get('/:id', controller.getDataMaster);
 
