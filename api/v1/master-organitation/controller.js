@@ -18,7 +18,7 @@ const httpCaller = require('../../../config/httpCaller');
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
-  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
   const id = customAlphabet(alphabet, n);
   return id();
 }
@@ -82,7 +82,10 @@ exports.getConfigTahun = async function (req, res) {
       ],
       where: {
         org_id: org_id
-      }
+      },
+      order: [
+        ['tahun_implementasi', 'ASC']
+      ]
     })
 
     res.header('access-token', req['access-token']);
