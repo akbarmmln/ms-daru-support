@@ -13,7 +13,15 @@ const adrCollectionSetup = require('../../../model/adr_collection_setup');
 const adrLogging = require('../../../model/adr_logging');
 const ApiErrorMsg = require('../../../error/apiErrorMsg')
 const HttpStatusCode = require("../../../error/httpStatusCode");
-const e = require('express');
+const Sequelize = require('sequelize');
+const httpCaller = require('../../../config/httpCaller');
+
+async function runNanoID(n) {
+  const { customAlphabet } = await import('nanoid');
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const id = customAlphabet(alphabet, n);
+  return id();
+}
 
 exports.getDataMaster = async function (req, res) {
   try {
@@ -58,8 +66,30 @@ exports.getConfig = async function (req, res) {
     res.header('access-token', req['access-token']);
     return res.status(200).json(rsmg('000000', data))
   } catch (e) {
-    logger.errorWithContext({ error: e, message: 'error GET /api/v1/master-organitation/config...'});
-    return utils.returnErrorFunction(res, 'error GET /api/v1/master-organitation/config...', e);
+    logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/config...'});
+    return utils.returnErrorFunction(res, 'error POST /api/v1/master-organitation/config...', e);
+  }
+}
+
+exports.getConfigTahun = async function (req, res) {
+  try{
+    const org_id = req.organitation_id;
+
+    const data = await adrCollectionSetup.findAll({
+      raw: true,
+      attributes: [
+        [Sequelize.fn('DISTINCT', Sequelize.col('tahun_implementasi')), 'tahun_implementasi']
+      ],
+      where: {
+        org_id: org_id
+      }
+    })
+
+    res.header('access-token', req['access-token']);
+    return res.status(200).json(rsmg('000000', data))
+  }catch(e){
+    logger.errorWithContext({ error: e, message: 'error GET /api/v1/master-organitation/config-tahun...'});
+    return utils.returnErrorFunction(res, 'error GET /api/v1/master-organitation/config-tahun...', e);
   }
 }
 
@@ -73,8 +103,18 @@ exports.createConfig = async function (req, res) {
       throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80002');
     }
 
+    let accountData = await httpCaller({
+      method: 'POST',
+      url: process.env.MS_ACCOUNT_V1_URL + '/account/inquiry',
+      data: {
+        account_id: account_id
+      }
+    })
+    accountData = accountData.data;
+
     for (let i=0; i<request.length; i++) {
-      let jenis_id = uuidv4();
+      let jenis_id = await runNanoID(10);
+      // let jenis_id = uuidv4();
       let logging_id = uuidv4();
       let jenis_iuran = request[i].jenis_iuran;
       let bulan_implementasi = request[i].bulan_implementasi;
@@ -96,7 +136,7 @@ exports.createConfig = async function (req, res) {
       await adrLogging.create({
         id: uuidv4(),
         logging_id: logging_id,
-        aktivitas: `${jenis_iuran}[${jenis_id}] dibuat oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`,
+        aktivitas: `${jenis_iuran}[${jenis_id}] dibuat oleh: ${accountData.data.nama}[${accountData.data.kk}] pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`,
         created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
       })
     }
@@ -129,6 +169,15 @@ exports.removeConfig = async function (req, res) {
       throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80003');
     }
 
+    let accountData = await httpCaller({
+      method: 'POST',
+      url: process.env.MS_ACCOUNT_V1_URL + '/account/inquiry',
+      data: {
+        account_id: account_id
+      }
+    })
+    accountData = accountData.data;
+
     await adrCollectionSetup.update({
       is_deleted: 1,
     }, {
@@ -160,6 +209,16 @@ exports.statusApproveReject = async function (req, res) {
       throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80002');
     }
 
+    let accountData = await httpCaller({
+      method: 'POST',
+      url: process.env.MS_ACCOUNT_V1_URL + '/account/inquiry',
+      data: {
+        account_id: account_id
+      }
+    })
+    accountData = accountData.data;
+
+
     for (let i=0; i<request.length; i++) {
       let id = request[i].id;
       let status = request[i].status;
@@ -173,9 +232,9 @@ exports.statusApproveReject = async function (req, res) {
       })
 
       if (status == '1') {
-        aktivitas = `${data?.jenis_iuran}[${data?.id}] disetujui oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
+        aktivitas = `${data?.jenis_iuran}[${data?.id}] disetujui oleh: ${accountData.data.nama}[${accountData.data.kk}] pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
       } else {
-        aktivitas = `${data?.jenis_iuran}[${data?.id}] tidak disetujui oleh id: ${account_id} pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
+        aktivitas = `${data?.jenis_iuran}[${data?.id}] tidak disetujui oleh: ${accountData.data.nama}[${accountData.data.kk}] pada tanggal ${formats.getCurrentTimeInJakarta(moment().format(), 'YYYY-MM-DD HH:mm:ss.SSS')}`
       }
 
       await adrCollectionSetup.update({

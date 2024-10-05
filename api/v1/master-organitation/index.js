@@ -7,6 +7,7 @@ router.post('/create-config', utils.verifyTokenMs, controller.createConfig);
 router.post('/remove-config', utils.verifyTokenMs, controller.removeConfig);
 router.post('/statued-config', utils.verifyTokenMs, controller.statusApproveReject);
 router.post('/config', utils.verifyTokenMs, controller.getConfig);
+router.get('/config-tahun', utils.verifyTokenMs, controller.getConfigTahun);
 
 router.get('/:id', controller.getDataMaster);
 
