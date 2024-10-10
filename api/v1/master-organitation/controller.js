@@ -50,7 +50,6 @@ exports.getConfig = async function (req, res) {
     const org_id = req.organitation_id;
     const tahun_implementasi = req.body.tahun_implementasi;
   
-    
     const data = await adrCollectionSetup.findAll({
       raw: true,
       where: {
@@ -67,7 +66,6 @@ exports.getConfig = async function (req, res) {
     let dataPush = [];
     for (let i = 0; i < data.length; i++) {
       const logging = await adrLogging.findAll({
-        raw: true,
         where: {
           logging_id: data[i].logging_id
         },
