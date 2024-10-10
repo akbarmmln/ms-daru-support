@@ -49,7 +49,8 @@ exports.getConfig = async function (req, res) {
   try {
     const org_id = req.organitation_id;
     const tahun_implementasi = req.body.tahun_implementasi;
-
+  
+    
     const data = await adrCollectionSetup.findAll({
       raw: true,
       where: {
@@ -63,8 +64,26 @@ exports.getConfig = async function (req, res) {
       throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80001');
     }
 
+    let dataPush = [];
+    for (let i = 0; i < data.length; i++) {
+      const logging = await adrLogging.findAll({
+        raw: true,
+        where: {
+          logging_id: data[i].logging_id
+        },
+        order: [
+          ['created_dt', 'ASC']
+        ]  
+      })
+
+      dataPush.push({
+        ...data[i],
+        logging
+      })
+    }
+
     res.header('access-token', req['access-token']);
-    return res.status(200).json(rsmg('000000', data))
+    return res.status(200).json(rsmg('000000', dataPush))
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/config...'});
     return utils.returnErrorFunction(res, 'error POST /api/v1/master-organitation/config...', e);
