@@ -17,9 +17,9 @@ exports.dateFormat = async function(date, type){
     }
 }
 
-exports.rupiahFormat = async function(rupiah, elit){
+exports.rupiahFormat = async function(rupiah){
     try{
-        const newRupiah = 'Rp ' + rupiah.toString().replace(/\B(?=(\d{3})+(?!\d))/g, `${elit}`)
+        const newRupiah = Number(rupiah).toLocaleString('id-ID')
         return newRupiah;
     } catch (e){
         logger.errorWithContext({message: 'error formating rupiah', error: e});
