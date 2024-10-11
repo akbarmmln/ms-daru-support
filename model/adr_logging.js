@@ -14,7 +14,7 @@ const adrLogging = dbConnection.define('adr_logging', {
     type: Sequelize.VIRTUAL,
     get() {
       const createdDt = this.getDataValue('created_dt');
-      return createdDt ? moment(createdDt).format('YYYY-MM-DD HH:mm:ss') : null;
+      return createdDt ? moment(createdDt).format('YYYY-MM-DD HH:mm:ss.SSS') : null;
     }
   }
 }, {
