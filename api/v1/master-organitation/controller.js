@@ -299,8 +299,9 @@ function readExcelFromBase64(base64) {
 
 exports.inputCheckFile = async function (req, res) {
   try {
+    console.log('payload received for inputCheckFile...', JSON.stringify(req.body))
     const path = req.body.path;
-
+    
     const worksheet = readExcelFromBase64(path)
     const cellAddress = 'B1';
     const cell = worksheet[cellAddress];
