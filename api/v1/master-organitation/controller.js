@@ -15,6 +15,7 @@ const ApiErrorMsg = require('../../../error/apiErrorMsg')
 const HttpStatusCode = require("../../../error/httpStatusCode");
 const Sequelize = require('sequelize');
 const httpCaller = require('../../../config/httpCaller');
+const xlsx = require('xlsx');
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
@@ -278,5 +279,83 @@ exports.statusApproveReject = async function (req, res) {
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/statued-config...' });
     return utils.returnErrorFunction(res, 'error POST /api/v1/master-organitation/statued-config...', e);
+  }
+}
+
+function readExcelFromFile(path) {
+  const workbook = xlsx.readFile(path); 
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  return worksheet;
+}
+
+function readExcelFromBase64(base64) {
+  const binaryString = Buffer.from(base64, 'base64');
+  const workbook = xlsx.read(binaryString, { type: 'buffer' });
+  const firstSheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[firstSheetName];
+  return worksheet;
+}
+
+exports.inputCheckFile = async function (req, res) {
+  try {
+    const path = req.body.path;
+
+    const worksheet = readExcelFromBase64(path)
+    const cellAddress = 'B1';
+    const cell = worksheet[cellAddress];
+    
+    const tahun = cell?.v;
+    if (formats.isEmpty(tahun)) {
+      throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80004', `kolom tahun implementasi kosong: perlu koreksi pada kolom tahun implementasi`);
+    }
+
+    const jsonData = [];
+    for (let row = 4; row <= 13; row++) {
+      const rowData = {
+        nama_iuran: worksheet[`A${row}`] ? worksheet[`A${row}`].v : null,
+        bulan_implementasi: worksheet[`B${row}`] ? worksheet[`B${row}`].v : null,
+        nominal_tagihan: worksheet[`C${row}`] ? worksheet[`C${row}`].v : null,
+      };
+      
+      if (rowData.nama_iuran || rowData.bulan_implementasi || rowData.nominal_tagihan) {
+        jsonData.push(rowData);
+      }
+    }
+
+    let row = 4;
+    for (let i=0; i<jsonData.length; i++) {
+      if (formats.isEmpty(jsonData[i].nama_iuran)) {
+        throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80005', `kolom nama iuran kosong: perlu koreksi pada baris ke-${row}`);
+      }
+
+      if (formats.isEmpty(jsonData[i].bulan_implementasi)) {
+        throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80005', `kolom bulan implementasi kosong: perlu koreksi pada baris ke-${row}`);
+      }
+
+      if (formats.isEmpty(jsonData[i].nominal_tagihan)) {
+        throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80005', `kolom nominal tagihan kosong: perlu koreksi pada baris ke-${row}`);
+      }
+
+      if (jsonData[i].bulan_implementasi != '0' && !(Number(jsonData[i].bulan_implementasi) >= 1 && Number(jsonData[i].bulan_implementasi) <= 12 && /^[0-9]+$/.test(jsonData[i].bulan_implementasi))) {
+        throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80005', `kesalahan input pada kolom bulan implementasi: perlu koreksi pada baris ke-${row}`);
+      }
+
+      const numericPattern = /^[0-9]+$/;
+      if (!numericPattern.test(jsonData[i].nominal_tagihan)) {
+        throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80005', `kesalahan input pada kolom nominal tagihan: perlu koreksi pada baris ke-${row}`);
+      }
+
+      row = row + 1;
+    }
+
+    return res.status(200).json(rsmg('000000', {
+      tahun: cell?.v,
+      data: jsonData,
+      length: jsonData.length
+    }))
+  } catch (e) {
+    logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation//input/cek-file...' });
+    return utils.returnErrorFunction(res, 'error POST /api/v1/master-organitation//input/cek-file...', e);
   }
 }

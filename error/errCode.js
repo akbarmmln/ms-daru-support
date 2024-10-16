@@ -3,6 +3,8 @@ const errCode = {
   '80001': 'data tidak ditemukan',
   '80002': 'request body not allowed',
   '80003': 'transaksi tidak diijinkan',
+  '80004': 'kesalahan input data',
+  '80005': 'kesalahan input data',
 };
 
 module.exports = errCode;
