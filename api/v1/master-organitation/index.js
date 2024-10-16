@@ -8,9 +8,8 @@ router.post('/remove-config', utils.verifyTokenMs, controller.removeConfig);
 router.post('/statued-config', utils.verifyTokenMs, controller.statusApproveReject);
 router.post('/config', utils.verifyTokenMs, controller.getConfig);
 router.get('/config-tahun', utils.verifyTokenMs, controller.getConfigTahun);
+router.post('/input/cek-file', utils.verifyTokenMs, controller.inputCheckFile);
 
 router.get('/:id', controller.getDataMaster);
-
-router.post('/input/cek-file', utils.verifyTokenMs, controller.inputCheckFile);
 
 module.exports = router;
