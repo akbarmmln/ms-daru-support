@@ -349,6 +349,7 @@ exports.inputCheckFile = async function (req, res) {
       row = row + 1;
     }
 
+    res.header('access-token', req['access-token']);
     return res.status(200).json(rsmg('000000', {
       tahun: cell?.v,
       data: jsonData,
