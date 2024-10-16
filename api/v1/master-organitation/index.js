@@ -11,6 +11,6 @@ router.get('/config-tahun', utils.verifyTokenMs, controller.getConfigTahun);
 
 router.get('/:id', controller.getDataMaster);
 
-router.post('/input/cek-file', controller.inputCheckFile);
+router.post('/input/cek-file', utils.verifyTokenMs, controller.inputCheckFile);
 
 module.exports = router;
