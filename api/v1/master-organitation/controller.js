@@ -225,10 +225,8 @@ exports.removeConfig = async function (req, res) {
 exports.statusApproveReject = async function (req, res) {
   try {
     const account_id = req.id;
-    const request = req.body.request;
-    if (!Array.isArray(request)) {
-      throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80002');
-    }
+    const id = req.body.id;
+    const status = req.body.status;
 
     let accountData = await httpCaller({
       method: 'POST',
@@ -239,40 +237,35 @@ exports.statusApproveReject = async function (req, res) {
     })
     accountData = accountData.data;
 
-
-    for (let i=0; i<request.length; i++) {
-      let id = request[i].id;
-      let status = request[i].status;
-      let aktivitas;
-
-      const data = await adrCollectionSetup.findOne({
-        raw: true,
-        where: {
-          id: id
-        }
-      })
-
-      if (status == '1') {
-        aktivitas = `${data?.jenis_iuran}[${data?.id}] disetujui oleh: ${accountData.data.nama}[${accountData.data.kk}]`
-      } else {
-        aktivitas = `${data?.jenis_iuran}[${data?.id}] tidak disetujui oleh: ${accountData.data.nama}[${accountData.data.kk}]`
+    const data = await adrCollectionSetup.findOne({
+      raw: true,
+      where: {
+        id: id
       }
+    })
 
-      await adrCollectionSetup.update({
-        status: status
-      }, {
-        where: {
-          id: data?.id
-        }
-      })
-
-      await adrLogging.create({
-        id: uuidv4(),
-        logging_id: data?.logging_id,
-        aktivitas: aktivitas,
-        created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
-      })
+    if (status == '1') {
+      aktivitas = `${data?.jenis_iuran}[${data?.id}] disetujui oleh: ${accountData.data.nama}[${accountData.data.kk}]`
+    } else if (status == '3') {
+      aktivitas = `${data?.jenis_iuran}[${data?.id}] tidak disetujui oleh: ${accountData.data.nama}[${accountData.data.kk}]`
+    } else {
+      throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80006');
     }
+
+    await adrCollectionSetup.update({
+      status: status
+    }, {
+      where: {
+        id: data?.id
+      }
+    })
+
+    await adrLogging.create({
+      id: uuidv4(),
+      logging_id: data?.logging_id,
+      aktivitas: aktivitas,
+      created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
+    })
 
     res.header('access-token', req['access-token']);
     return res.status(200).json(rsmg('000000'))

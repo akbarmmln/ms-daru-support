@@ -5,6 +5,7 @@ const errCode = {
   '80003': 'transaksi tidak diijinkan',
   '80004': 'kesalahan input data',
   '80005': 'kesalahan input data',
+  '80006': 'request perubahan status tidak diijinkan',
 };
 
 module.exports = errCode;
