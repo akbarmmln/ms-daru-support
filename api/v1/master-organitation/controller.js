@@ -116,6 +116,7 @@ exports.getConfigTahun = async function (req, res) {
 
 exports.createConfig = async function (req, res) {
   try {
+    console.log('payload received for createConfig...', JSON.stringify(req.body))
     const org_id = req.organitation_id;
     const account_id = req.id;
 
