@@ -227,7 +227,8 @@ exports.statusApproveReject = async function (req, res) {
     const account_id = req.id;
     const id = req.body.id;
     const status = req.body.status;
-
+    let aktivitas;
+    
     let accountData = await httpCaller({
       method: 'POST',
       url: process.env.MS_ACCOUNT_V1_URL + '/account/inquiry',
