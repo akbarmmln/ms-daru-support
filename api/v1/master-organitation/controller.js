@@ -50,15 +50,22 @@ exports.getConfig = async function (req, res) {
   try {
     const org_id = req.organitation_id;
     const tahun_implementasi = req.body.tahun_implementasi;
-  
-    const data = await adrCollectionSetup.findAll({
+    const status = req.body.status;
+
+    let payloadQuery = {
       raw: true,
       where: {
         is_deleted: 0,
         org_id: org_id,
         tahun_implementasi: tahun_implementasi
       }
-    })
+    }
+
+    if (!formats.isEmpty(status)) {
+      payloadQuery.where.status = status
+    }
+
+    const data = await adrCollectionSetup.findAll(payloadQuery);
 
     if (data.length == 0) {
       throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80001');
