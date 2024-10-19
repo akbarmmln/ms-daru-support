@@ -16,7 +16,6 @@ const HttpStatusCode = require("../../../error/httpStatusCode");
 const Sequelize = require('sequelize');
 const httpCaller = require('../../../config/httpCaller');
 const xlsx = require('xlsx');
-const Sequelize = require('sequelize');
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
