@@ -16,6 +16,7 @@ const HttpStatusCode = require("../../../error/httpStatusCode");
 const Sequelize = require('sequelize');
 const httpCaller = require('../../../config/httpCaller');
 const xlsx = require('xlsx');
+const Sequelize = require('sequelize');
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
@@ -58,7 +59,8 @@ exports.getConfig = async function (req, res) {
         is_deleted: 0,
         org_id: org_id,
         tahun_implementasi: tahun_implementasi
-      }
+      },
+      order: Sequelize.literal(`FIELD(status, '1','2','3')`),
     }
 
     if (!formats.isEmpty(status)) {
