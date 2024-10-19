@@ -165,7 +165,7 @@ exports.createConfig = async function (req, res) {
       await adrLogging.create({
         id: uuidv4(),
         logging_id: logging_id,
-        aktivitas: `${jenis_iuran}[${jenis_id}] dibuat oleh: ${accountData.data.nama}[${accountData.data.kk}]`,
+        aktivitas: `${jenis_iuran} [${jenis_id}] dibuat oleh: ${accountData.data.nama} [${accountData.data.kk}]`,
         created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
       })
     }
@@ -218,7 +218,7 @@ exports.removeConfig = async function (req, res) {
     await adrLogging.create({
       id: uuidv4(),
       logging_id: data?.logging_id,
-      aktivitas: `${data?.jenis_iuran}[${data?.id}] dihapus oleh id: ${account_id}`,
+      aktivitas: `${data?.jenis_iuran} [${data?.id}] dihapus oleh: ${accountData.data.nama} [${accountData.data.kk}]`,
       created_dt: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
     })
 
@@ -254,9 +254,9 @@ exports.statusApproveReject = async function (req, res) {
     })
 
     if (status == '1') {
-      aktivitas = `${data?.jenis_iuran}[${data?.id}] disetujui oleh: ${accountData.data.nama}[${accountData.data.kk}]`
+      aktivitas = `${data?.jenis_iuran} [${data?.id}] disetujui oleh: ${accountData.data.nama} [${accountData.data.kk}]`
     } else if (status == '3') {
-      aktivitas = `${data?.jenis_iuran}[${data?.id}] tidak disetujui oleh: ${accountData.data.nama}[${accountData.data.kk}]`
+      aktivitas = `${data?.jenis_iuran} [${data?.id}] tidak disetujui oleh: ${accountData.data.nama} [${accountData.data.kk}]`
     } else {
       throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80006');
     }
