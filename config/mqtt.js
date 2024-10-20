@@ -2,10 +2,10 @@ const mqtt = require('mqtt');
 const logger = require('./logger');
 
 exports.mqttForLoket = async function () {
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 1; i++) {
     (function (i) {  // Closure to maintain the correct value of `i`
+      let topic = `loket-00${i}`;
       try {
-        let topic = `loket-00${i}`;
         const qos = 0;
         const clientId = 'emqx_nodejs_' + Math.random().toString(16).substring(2, 8);
 
