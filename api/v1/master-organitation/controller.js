@@ -357,7 +357,7 @@ exports.inputCheckFile = async function (req, res) {
       length: jsonData.length
     }))
   } catch (e) {
-    logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation//input/cek-file...' });
-    return utils.returnErrorFunction(res, 'error POST /api/v1/master-organitation//input/cek-file...', e);
+    logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/input/cek-file...' });
+    return utils.returnErrorFunction(res, 'error POST /api/v1/master-organitation/input/cek-file...', e);
   }
 }
