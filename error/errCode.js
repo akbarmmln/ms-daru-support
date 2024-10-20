@@ -6,6 +6,7 @@ const errCode = {
   '80004': 'kesalahan input data',
   '80005': 'kesalahan input data',
   '80006': 'request perubahan status tidak diijinkan',
+  '80007': 'client mqtt not found or already disconnect',
 };
 
 module.exports = errCode;

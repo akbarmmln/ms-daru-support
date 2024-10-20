@@ -10,12 +10,22 @@ const ApiErrorMsg = require('../../../error/apiErrorMsg')
 const HttpStatusCode = require("../../../error/httpStatusCode");
 const adrLoketAvail = require('../../../model/adr_loket_tersedia');
 const mqtt = require('mqtt');
+const e = require('express');
+let clinetDatas = [];
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
   const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
   const id = customAlphabet(alphabet, n);
   return id();
+}
+
+async function createSqlLoket(paylod) {
+  try {
+    await adrLoketAvail.create(paylod);
+  } catch (e) {
+    logger.errorWithContext({ error: e, message: `error while running sql create loket` });
+  }
 }
 
 exports.createLoket = async function (req, res) {
@@ -46,6 +56,7 @@ exports.createLoket = async function (req, res) {
           password: process.env.PASS_MQTT,
           clientId: clientId
         });
+        console.log('isi client nya ', client)
 
         client.on("connect", function (connack) {
           logger.infoWithContext(`client connected to ${topic}, ${JSON.stringify(connack)}`);
@@ -55,8 +66,11 @@ exports.createLoket = async function (req, res) {
               logger.errorWithContext({ error: error, message: `subscribe error to topic ${topic}` });
               return;
             }
-
-            adrLoketAvail.create(payloadCreate);
+            createSqlLoket(payloadCreate);
+            clinetDatas.push({
+              clientId: clientId,
+              clientConnect: client
+            })
             logger.infoWithContext(`Subscribe success to topic ${topic}`);
           });
         });
@@ -105,4 +119,49 @@ exports.createLoket = async function (req, res) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/mqtt/create-loket...' });
     return utils.returnErrorFunction(res, 'error POST /api/v1/mqtt/create-loket...', e);
   }
+}
+
+exports.removeLoket = async function (req, res) {
+  try {
+    const client_id = req.body.client_id;
+    const matchedClient = clinetDatas.find(item => item.clientId === client_id);
+    if (!formats.isEmpty(matchedClient?.clientId)) {
+      const details = await adrLoketAvail.findOne({
+        raw: true,
+        where: {
+          client_id: client_id
+        }
+      })
+
+      if (details && details.is_deleted !== 1) {
+        const client = matchedClient.clientConnect;
+        await endClientMqtt(client);
+        await adrLoketAvail.update({
+          is_deleted: 1
+        }, {
+          where: {
+            id: details.id
+          }
+        })
+      } else {
+        throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80007');
+      }
+    }
+    return res.status(200).json(rsmg('000000', matchedClient.clientId))
+  } catch (e) {
+    logger.errorWithContext({ error: e, message: 'error POST /api/v1/mqtt/remove-loket...' });
+    return utils.returnErrorFunction(res, 'error POST /api/v1/mqtt/remove-loket...', e);
+  }
+}
+
+function endClientMqtt(client) {
+  return new Promise((resolve, reject) => {
+    client.end(false, (error) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
