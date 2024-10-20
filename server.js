@@ -8,6 +8,6 @@ const mqttConfig = require('./config/mqtt');
 let PORT = process.env.PORT
 
 const server = app.listen(PORT, () => logger.infoWithContext(`API Server started. Listening on port:${PORT}`));
-mqttConfig.mqtt();
+mqttConfig.mqttForLoket();
 
 module.exports = server;
