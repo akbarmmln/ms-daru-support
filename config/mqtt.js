@@ -60,7 +60,8 @@ exports.addSubscription = async function (clientId, newTopics, saveTopic) {
   const client = global.clients.find(client => client.clientId === clientId);
   const qos = 0;
   if (client) {
-    client.subscribe(newTopics, { qos }, (err, granted) => {
+    const clientData = client.clientData
+    clientData.subscribe(newTopics, { qos }, (err, granted) => {
       if (err) {
         logger.errorWithContext({ error: err, message: `subscribe error to topic` })
       } else {

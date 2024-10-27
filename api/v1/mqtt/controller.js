@@ -75,7 +75,7 @@ exports.removeLoket = async function (req, res) {
         transactionDB
       })
 
-      await endSubscriptionMqtt(client, topic);
+      await endSubscriptionMqtt(client.clientData, topic);
 
       await adrLoketAvail.update({
         is_deleted: 1
@@ -131,7 +131,9 @@ exports.removeClientID = async function(req, res) {
   try{
     const client_id = req.body.client_id;
     const client = global.clients.find(client => client.clientId === client_id);
-    await endClientMqtt(client);
+    if (client) {
+      await endClientMqtt(client.clientData);
+    }
     return res.status(200).json(rsmg('000000'))
   }catch(e){
     logger.errorWithContext({ error: e, message: 'error' });
