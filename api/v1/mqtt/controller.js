@@ -9,9 +9,8 @@ const formats = require('../../../config/format');
 const ApiErrorMsg = require('../../../error/apiErrorMsg')
 const HttpStatusCode = require("../../../error/httpStatusCode");
 const adrLoketAvail = require('../../../model/adr_loket_tersedia');
-const mqtt = require('mqtt');
-const e = require('express');
-let clinetDatas = [];
+const redis = require('../../../config/redis');
+const mqtt = require('../../../config/mqtt');
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
@@ -20,26 +19,19 @@ async function runNanoID(n) {
   return id();
 }
 
-async function createSqlLoket(paylod) {
-  try {
-    await adrLoketAvail.create(paylod);
-  } catch (e) {
-    logger.errorWithContext({ error: e, message: `error while running sql create loket` });
-  }
-}
-
 exports.createLoket = async function (req, res) {
   try {
     const jumlah_counter = req.body.jumlah_counter;
     const num_counter = parseInt(jumlah_counter);
+    const clientId = 'mqtt_antiran';
+
+    let pushTopic = [];
+    let pushSaveData = [];
 
     for (let i = 1; i <= num_counter; i++) {
-      let jenis_id = await runNanoID(5);
-      let topic = `loket-${jenis_id}`;
       try {
-        const qos = 0;
-        const clientId = 'emqx_nodejs_' + Math.random().toString(16).substring(2, 8);
-
+        let id = await runNanoID(5);
+        let topic = `loket-${id}`;  
         let payloadCreate = {
           id: uuidv4(),
           created_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -49,72 +41,18 @@ exports.createLoket = async function (req, res) {
           client_topic: topic,
           client_id: clientId
         }
-
-        const client = mqtt.connect(process.env.HOST_MQTT, {
-          ca: [process.env.CA_CERT_MQTT.replace(/\\n/gm, '\n')],
-          username: process.env.USR_MQTT,
-          password: process.env.PASS_MQTT,
-          clientId: clientId
-        });
-        console.log('isi client nya ', client)
-
-        client.on("connect", function (connack) {
-          logger.infoWithContext(`client connected to ${topic}, ${JSON.stringify(connack)}`);
-
-          client.subscribe(topic, { qos }, (error) => {
-            if (error) {
-              logger.errorWithContext({ error: error, message: `subscribe error to topic ${topic}` });
-              return;
-            }
-            createSqlLoket(payloadCreate);
-            clinetDatas.push({
-              clientId: clientId,
-              clientConnect: client
-            })
-            logger.infoWithContext(`Subscribe success to topic ${topic}`);
-          });
-        });
-
-        client.on("error", function (err) {
-          logger.errorWithContext({ error: err, message: `Error occurs in topic ${topic}` });
-          if (err.code == "ENOTFOUND") {
-            logger.infoWithContext(`Network error, make sure you have an active internet connection in topic ${topic}`);
-          }
-        });
-
-        client.on("close", function () {
-          logger.infoWithContext(`Connection closed by client in topic ${topic}`);
-        });
-
-        client.on("reconnect", function () {
-          logger.infoWithContext(`Client trying a reconnection in topic ${topic}`);
-        });
-
-        client.on("offline", function () {
-          logger.infoWithContext(`Client is currently offline in topic ${topic}`);
-        });
-
-        client.on('message', function (receivedTopic, message, packet) {
-          try {
-            let a = packet.payload.toString();
-            let b = JSON.parse(a);
-            logger.infoWithContext(`packet received for topic ${receivedTopic}, ${a}`);
-            logger.infoWithContext(`packet received for topic ${receivedTopic} in json , ${JSON.stringify(b)}`);
-            logger.infoWithContext(`message received for topic ${message}`);
-          } catch (e) {
-            logger.errorWithContext({ error: e, message: `error on message received parsing for topic ${receivedTopic}` });
-          }
-        });
-
-        client.on("packetsend", function (packet) {
-          logger.infoWithContext(`packet sent for topic ${topic}, ${packet}`);
-        });
+        pushTopic.push(topic);
+        pushSaveData.push(payloadCreate)
       } catch (e) {
-        logger.errorWithContext({ error: e, message: `looping occurs error in topic ${topic}` });
+        logger.errorWithContext({ error: e, message: `looping occurs error in topic created` });
         continue;
       }
     }
-    return res.status(200).json(rsmg('000000'));
+
+    await mqtt.createMqttConnection(clientId);
+    await mqtt.addSubscription(clientId, pushTopic, pushSaveData);
+    
+    return res.status(200).json(rsmg('000000', pushSaveData));
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/mqtt/create-loket...' });
     return utils.returnErrorFunction(res, 'error POST /api/v1/mqtt/create-loket...', e);
@@ -124,7 +62,7 @@ exports.createLoket = async function (req, res) {
 exports.removeLoket = async function (req, res) {
   try {
     const client_id = req.body.client_id;
-    const matchedClient = clinetDatas.find(item => item.clientId === client_id);
+    const matchedClient = clientDatas.find(item => item.clientId === client_id);
     if (!formats.isEmpty(matchedClient?.clientId)) {
       const details = await adrLoketAvail.findOne({
         raw: true,
@@ -146,6 +84,8 @@ exports.removeLoket = async function (req, res) {
       } else {
         throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80007');
       }
+    } else {
+      throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80007');
     }
     return res.status(200).json(rsmg('000000', matchedClient.clientId))
   } catch (e) {
@@ -164,4 +104,87 @@ function endClientMqtt(client) {
       }
     });
   });
+}
+
+const mqtts = require('mqtt');
+exports.get = async function(req, res) {
+  try{
+    // const client = mqtts.connect(process.env.HOST_MQTT, {
+    //   ca: [process.env.CA_CERT_MQTT.replace(/\\n/gm, '\n')],
+    //   username: process.env.USR_MQTT,
+    //   password: process.env.PASS_MQTT,
+    //   clientId: '123'
+    // });
+
+    // const options = {
+    //   host: 'brokers.mtfa.my.id',
+    //   port: '8883',
+    //   protocol: 'mqtts',
+    //   username: 'allforyu',
+    //   password: 'Akbarakbar@99',
+    //   ca: [process.env.CA_CERT_MQTT_NEW.replace(/\\n/gm, '\n')],
+    //   clientId: '123'
+    // }
+
+    const options = {
+      host: 'bea519f3.ala.us-east-1.emqxsl.com',
+      port: '8883',
+      protocol: 'mqtts',
+      username: 'allforyu',
+      password: 'Akbarakbar@99',
+      ca: [process.env.CA_CERT_MQTT.replace(/\\n/gm, '\n')],
+      clientId: '123'
+    }
+
+    const client = mqtts.connect(options);
+    const qos = 0;
+
+    console.log('sadasdasd', client)
+    console.log('hahahahha', typeof client);
+
+    client.on('connect', () => {
+      logger.infoWithContext(`Client connected`);
+      client.subscribe('newTopics', { qos }, (err, granted) => {
+        if (err) {
+          logger.errorWithContext({ error: err, message: `subscribe error to topic` })
+        } else {
+          logger.infoWithContext(`Subscribe success to topic ${granted}`)
+        }
+      });
+    });
+
+    client.on("error", function (err) {
+      console.log("Error: " + err)
+      if (err.code == "ENOTFOUND") {
+        console.log("Network error, make sure you have an active internet connection")
+      }
+    })
+
+    client.on('message', (receivedTopic, message, packet) => {
+      const packets = packet.payload.toString();
+      logger.infoWithContext(`Received message from topic ${receivedTopic}: ${packets}`);
+    });
+  
+    return res.status(200).json(rsmg('000000'))
+  }catch(e){
+    logger.errorWithContext({ error: e, message: 'error' });
+    return utils.returnErrorFunction(res, 'error', e);
+  }
+}
+
+exports.end = async function(req, res) {
+  try{
+    const a = await redis.get('key1');
+    a.end(false, (error) => {
+      if (error) {
+        console.log('gagal', error)
+      } else {
+        console.log('sukses')
+      }
+    });
+    return res.status(200).json(rsmg('000000'))
+  }catch(e){
+    logger.errorWithContext({ error: e, message: 'error' });
+    return utils.returnErrorFunction(res, 'error', e);
+  }
 }

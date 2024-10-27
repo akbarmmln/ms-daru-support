@@ -14,7 +14,7 @@ const adrLoketAvail = dbConnection.define('adr_loket_tersedia', {
   is_deleted: Sequelize.INTEGER,
   nama_loket: Sequelize.STRING,
   client_topic: Sequelize.STRING,
-  client_id: Sequelize.STRING,
+  client_id: Sequelize.STRING
 }, {
   freezeTableName: true,
   timestamps: false,

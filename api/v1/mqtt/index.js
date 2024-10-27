@@ -6,4 +6,7 @@ const utils = require('../../../utils/utils');
 router.post('/create-loket', utils.verifyTokenMs, controller.createLoket);
 router.post('/remove-loket', utils.verifyTokenMs, controller.removeLoket);
 
+router.get('/get', controller.get);
+router.get('/end', controller.end);
+
 module.exports = router;
