@@ -21,9 +21,9 @@ async function runNanoID(n) {
 
 exports.createLoket = async function (req, res) {
   try {
+    const client_id = req.body.client_id;
     const jumlah_counter = req.body.jumlah_counter;
     const num_counter = parseInt(jumlah_counter);
-    const clientId = 'mqtt_antiran';
 
     let pushTopic = [];
     let pushSaveData = [];
@@ -39,7 +39,7 @@ exports.createLoket = async function (req, res) {
           is_deleted: 0,
           nama_loket: topic,
           client_topic: topic,
-          client_id: clientId
+          client_id: client_id
         }
         pushTopic.push(topic);
         pushSaveData.push(payloadCreate)
@@ -49,8 +49,8 @@ exports.createLoket = async function (req, res) {
       }
     }
 
-    await mqtt.createMqttConnection(clientId);
-    await mqtt.addSubscription(clientId, pushTopic, pushSaveData);
+    await mqtt.createMqttConnection(client_id);
+    await mqtt.addSubscription(client_id, pushTopic, pushSaveData);
     
     return res.status(200).json(rsmg('000000', pushSaveData));
   } catch (e) {
@@ -62,9 +62,9 @@ exports.createLoket = async function (req, res) {
 exports.removeLoket = async function (req, res) {
   const transactionDB = await dbconnect.transaction();
   try {
-    const clientId = req.body.clientId;
+    const client_id = req.body.client_id;
     const topic = req.body.topic;
-    const client = global.clients[clientId];
+    const client = global.clients[client_id];
     if (client) {
       const details = await adrLoketAvail.findOne({
         raw: true,
@@ -103,8 +103,10 @@ function endSubscriptionMqtt(client, topic) {
   return new Promise((resolve, reject) => {
     client.unsubscribe(topic, { qos }, (error) => {
       if (error) {
+        logger.errorWithContext({ error: error, message: `error for unsubscribe topic ${topic} in client id ${client}` });
         reject(error);
       } else {
+        logger.infoWithContext(`success for unsubscribe topic ${topic} in client id ${client}`)
         resolve();
       }
     });
@@ -115,16 +117,21 @@ function endClientMqtt(client) {
   return new Promise((resolve, reject) => {
     client.end(false, (error) => {
       if (error) {
+        logger.errorWithContext({ error: error, message: `error session end for client id ${client}` });
         reject(error);
       } else {
+        logger.infoWithContext(`success session end for client id ${client}`)
         resolve();
       }
     });
   });
 }
 
-exports.get = async function(req, res) {
+exports.removeClientID = async function(req, res) {
   try{
+    const client_id = req.body.client_id;
+    const client = global.clients[client_id];
+    await endClientMqtt(client);
     return res.status(200).json(rsmg('000000'))
   }catch(e){
     logger.errorWithContext({ error: e, message: 'error' });
