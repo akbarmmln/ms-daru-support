@@ -30,16 +30,16 @@ exports.createMqttConnection = async function (clientId) {
         clientData: client
       })
   
-      client.on('connect', async () => {
+      client.on('connect', () => {
         logger.infoWithContext(`Client with ID ${clientId} connected`);
       });
     
-      client.on('message', async (receivedTopic, message, packet) => {
+      client.on('message', (receivedTopic, message, packet) => {
         const packets = packet.payload.toString();
         logger.infoWithContext(`Received message from topic ${receivedTopic}: ${packets}`);
       });
   
-      client.on('error', async (err) => {
+      client.on('error', (err) => {
         logger.errorWithContext({ error: err, message: `error accoures...` });
         if (err.code == "ENOTFOUND") {
           logger.infoWithContext(`Network error, make sure you have an active internet connection`)
