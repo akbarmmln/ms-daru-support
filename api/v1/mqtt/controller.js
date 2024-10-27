@@ -123,7 +123,7 @@ exports.get = async function(req, res) {
       username: process.env.USR_MQTT,
       password: process.env.PASS_MQTT,
       ca: [process.env.CA_CERT_MQTT_NEW.replace(/\\n/gm, '\n')],
-      clientId: clientId
+      clientId: "123"
     }
 
     // const options = {
