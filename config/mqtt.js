@@ -1,7 +1,6 @@
 const mqtt = require('mqtt');
 const logger = require('./logger');
 const adrLoketAvail = require('../model/adr_loket_tersedia');
-const redis = require('../config/redis');
 global.clients = {};
 const formats = require('./format');
 
@@ -136,7 +135,6 @@ exports.mqttForCreateLoker = async function() {
     const clientId = 'emqx_nodejs_' + Math.random().toString(16).substring(2, 8);
 
     const client = await exports.createMqttConnection(clientId);
-    redis.set(topic, client);
 
     client.on("connect", function (connack) {
       logger.infoWithContext(`client connected to topic ${topic}, ${connack}`);

@@ -9,7 +9,6 @@ const formats = require('../../../config/format');
 const ApiErrorMsg = require('../../../error/apiErrorMsg')
 const HttpStatusCode = require("../../../error/httpStatusCode");
 const adrLoketAvail = require('../../../model/adr_loket_tersedia');
-const redis = require('../../../config/redis');
 const mqtt = require('../../../config/mqtt');
 
 async function runNanoID(n) {
@@ -165,23 +164,6 @@ exports.get = async function(req, res) {
       logger.infoWithContext(`Received message from topic ${receivedTopic}: ${packets}`);
     });
   
-    return res.status(200).json(rsmg('000000'))
-  }catch(e){
-    logger.errorWithContext({ error: e, message: 'error' });
-    return utils.returnErrorFunction(res, 'error', e);
-  }
-}
-
-exports.end = async function(req, res) {
-  try{
-    const a = await redis.get('key1');
-    a.end(false, (error) => {
-      if (error) {
-        console.log('gagal', error)
-      } else {
-        console.log('sukses')
-      }
-    });
     return res.status(200).json(rsmg('000000'))
   }catch(e){
     logger.errorWithContext({ error: e, message: 'error' });
