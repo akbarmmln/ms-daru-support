@@ -116,25 +116,25 @@ exports.get = async function(req, res) {
     //   clientId: '123'
     // });
 
+    const options = {
+      host: process.env.HOST_MQTT_NEW,
+      port: '8883',
+      protocol: 'mqtts',
+      username: process.env.USR_MQTT,
+      password: process.env.PASS_MQTT,
+      ca: [process.env.CA_CERT_MQTT_NEW.replace(/\\n/gm, '\n')],
+      clientId: clientId
+    }
+
     // const options = {
-    //   host: 'brokers.mtfa.my.id',
+    //   host: 'bea519f3.ala.us-east-1.emqxsl.com',
     //   port: '8883',
     //   protocol: 'mqtts',
     //   username: 'allforyu',
     //   password: 'Akbarakbar@99',
-    //   ca: [process.env.CA_CERT_MQTT_NEW.replace(/\\n/gm, '\n')],
+    //   ca: [process.env.CA_CERT_MQTT.replace(/\\n/gm, '\n')],
     //   clientId: '123'
     // }
-
-    const options = {
-      host: 'bea519f3.ala.us-east-1.emqxsl.com',
-      port: '8883',
-      protocol: 'mqtts',
-      username: 'allforyu',
-      password: 'Akbarakbar@99',
-      ca: [process.env.CA_CERT_MQTT.replace(/\\n/gm, '\n')],
-      clientId: '123'
-    }
 
     const client = mqtts.connect(options);
     const qos = 0;
