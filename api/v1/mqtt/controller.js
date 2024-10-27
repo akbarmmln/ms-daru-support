@@ -64,7 +64,7 @@ exports.removeLoket = async function (req, res) {
   try {
     const client_id = req.body.client_id;
     const topic = req.body.topic;
-    const client = global.clients[client_id];
+    const client = global.clients.find(client => client.clientId === client_id);
     if (client) {
       const details = await adrLoketAvail.findOne({
         raw: true,
@@ -130,7 +130,7 @@ function endClientMqtt(client) {
 exports.removeClientID = async function(req, res) {
   try{
     const client_id = req.body.client_id;
-    const client = global.clients[client_id];
+    const client = global.clients.find(client => client.clientId === client_id);
     await endClientMqtt(client);
     return res.status(200).json(rsmg('000000'))
   }catch(e){

@@ -1,8 +1,7 @@
 const mqtt = require('mqtt');
 const logger = require('./logger');
 const adrLoketAvail = require('../model/adr_loket_tersedia');
-global.clients = {};
-const formats = require('./format');
+global.clients = [];
 
 async function createSqlLoket(paylod) {
   try {
@@ -14,7 +13,7 @@ async function createSqlLoket(paylod) {
 
 exports.createMqttConnection = async function (clientId) {
   try {
-    const client = global.clients[clientId];
+    const client = global.clients.find(client => client.clientId === clientId);
     if (!client) {
       const options = {
         host: process.env.HOST_MQTT_NEW,
@@ -26,18 +25,21 @@ exports.createMqttConnection = async function (clientId) {
         clientId: clientId
       }
       const client = mqtt.connect(options);  
-      global.clients[clientId] = client;
+      global.clients.push({
+        clientId: clientId,
+        clientData: client
+      })
   
-      client.on('connect', () => {
+      client.on('connect', async () => {
         logger.infoWithContext(`Client with ID ${clientId} connected`);
       });
     
-      client.on('message', (receivedTopic, message, packet) => {
+      client.on('message', async (receivedTopic, message, packet) => {
         const packets = packet.payload.toString();
         logger.infoWithContext(`Received message from topic ${receivedTopic}: ${packets}`);
       });
   
-      client.on('error', function (err) {
+      client.on('error', async (err) => {
         logger.errorWithContext({ error: err, message: `error accoures...` });
         if (err.code == "ENOTFOUND") {
           logger.infoWithContext(`Network error, make sure you have an active internet connection`)
@@ -46,7 +48,7 @@ exports.createMqttConnection = async function (clientId) {
   
       return client;
     } else {
-      return client;
+      return client.clientData;
     }
   }catch(e){
     logger.errorWithContext({ error: e, message: `error membuat koneksi ke server mqtt` });
@@ -55,7 +57,7 @@ exports.createMqttConnection = async function (clientId) {
 }
 
 exports.addSubscription = async function (clientId, newTopics, saveTopic) {
-  const client = global.clients[clientId];
+  const client = global.clients.find(client => client.clientId === clientId);
   const qos = 0;
   if (client) {
     client.subscribe(newTopics, { qos }, (err, granted) => {
@@ -128,33 +130,5 @@ exports.mqttForLoket = async function () {
         logger.infoWithContext(`packet sent for topic ${topic}, ${packet}`);
       });
     })(i);
-  }
-}
-
-exports.mqttForCreateLoker = async function() {
-  try {
-    let message = {
-      init: 'hellow mqtt'
-    }
-    message = JSON.stringify(message);
-    const topic = 'server-loket';
-    const qos = 0;
-    const clientId = 'emqx_nodejs_' + Math.random().toString(16).substring(2, 8);
-
-    const client = await exports.createMqttConnection(clientId);
-
-    client.on("connect", function (connack) {
-      logger.infoWithContext(`client connected to topic ${topic}, ${connack}`);
-
-      client.subscribe(topic, { qos }, (error) => {
-        if (error) {
-          logger.errorWithContext({ error: e, message: `subscribe error to topic : ${topic}` })
-          return;
-        }
-        logger.infoWithContext(`Subscribe success to topic '${topic}'`)
-      })
-    })
-  } catch (e) {
-    logger.errorWithContext({ error: e, message: 'error while creating locker mqtt...' })
   }
 }
