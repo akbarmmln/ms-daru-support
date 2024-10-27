@@ -10,6 +10,7 @@ const ApiErrorMsg = require('../../../error/apiErrorMsg')
 const HttpStatusCode = require("../../../error/httpStatusCode");
 const adrLoketAvail = require('../../../model/adr_loket_tersedia');
 const mqtt = require('../../../config/mqtt');
+const dbconnect = require('../../../config/db').Sequelize;
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
@@ -59,38 +60,55 @@ exports.createLoket = async function (req, res) {
 }
 
 exports.removeLoket = async function (req, res) {
+  const transactionDB = await dbconnect.transaction();
   try {
-    const client_id = req.body.client_id;
-    const matchedClient = clientDatas.find(item => item.clientId === client_id);
-    if (!formats.isEmpty(matchedClient?.clientId)) {
+    const clientId = req.body.clientId;
+    const topic = req.body.topic;
+    const client = global.clients[clientId];
+    if (client) {
       const details = await adrLoketAvail.findOne({
         raw: true,
         where: {
-          client_id: client_id
-        }
+          client_topic: topic
+        },
+        lock: true,
+        transactionDB
       })
 
-      if (details && details.is_deleted !== 1) {
-        const client = matchedClient.clientConnect;
-        await endClientMqtt(client);
-        await adrLoketAvail.update({
-          is_deleted: 1
-        }, {
-          where: {
-            id: details.id
-          }
-        })
-      } else {
-        throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80007');
-      }
-    } else {
-      throw new ApiErrorMsg(HttpStatusCode.BAD_REQUEST, '80007');
+      await endSubscriptionMqtt(client, topic);
+
+      await adrLoketAvail.update({
+        is_deleted: 1
+      }, {
+        where: {
+          id: details?.id
+        },
+        transaction: transactionDB
+      })
     }
-    return res.status(200).json(rsmg('000000', matchedClient.clientId))
+
+    await transactionDB.commit();
+    return res.status(200).json(rsmg('000000'))
   } catch (e) {
+    if (transactionDB) {
+      await transactionDB.rollback();
+    }
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/mqtt/remove-loket...' });
     return utils.returnErrorFunction(res, 'error POST /api/v1/mqtt/remove-loket...', e);
   }
+}
+
+function endSubscriptionMqtt(client, topic) {
+  const qos = 0;
+  return new Promise((resolve, reject) => {
+    client.unsubscribe(topic, { qos }, (error) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
 
 function endClientMqtt(client) {
@@ -105,65 +123,8 @@ function endClientMqtt(client) {
   });
 }
 
-const mqtts = require('mqtt');
 exports.get = async function(req, res) {
   try{
-    // const client = mqtts.connect(process.env.HOST_MQTT, {
-    //   ca: [process.env.CA_CERT_MQTT.replace(/\\n/gm, '\n')],
-    //   username: process.env.USR_MQTT,
-    //   password: process.env.PASS_MQTT,
-    //   clientId: '123'
-    // });
-
-    const options = {
-      host: process.env.HOST_MQTT_NEW,
-      port: '8883',
-      protocol: 'mqtts',
-      username: process.env.USR_MQTT,
-      password: process.env.PASS_MQTT,
-      ca: [process.env.CA_CERT_MQTT_NEW.replace(/\\n/gm, '\n')],
-      clientId: "123"
-    }
-
-    // const options = {
-    //   host: 'bea519f3.ala.us-east-1.emqxsl.com',
-    //   port: '8883',
-    //   protocol: 'mqtts',
-    //   username: 'allforyu',
-    //   password: 'Akbarakbar@99',
-    //   ca: [process.env.CA_CERT_MQTT.replace(/\\n/gm, '\n')],
-    //   clientId: '123'
-    // }
-
-    const client = mqtts.connect(options);
-    const qos = 0;
-
-    console.log('sadasdasd', client)
-    console.log('hahahahha', typeof client);
-
-    client.on('connect', () => {
-      logger.infoWithContext(`Client connected`);
-      client.subscribe('newTopics', { qos }, (err, granted) => {
-        if (err) {
-          logger.errorWithContext({ error: err, message: `subscribe error to topic` })
-        } else {
-          logger.infoWithContext(`Subscribe success to topic ${granted}`)
-        }
-      });
-    });
-
-    client.on("error", function (err) {
-      console.log("Error: " + err)
-      if (err.code == "ENOTFOUND") {
-        console.log("Network error, make sure you have an active internet connection")
-      }
-    })
-
-    client.on('message', (receivedTopic, message, packet) => {
-      const packets = packet.payload.toString();
-      logger.infoWithContext(`Received message from topic ${receivedTopic}: ${packets}`);
-    });
-  
     return res.status(200).json(rsmg('000000'))
   }catch(e){
     logger.errorWithContext({ error: e, message: 'error' });

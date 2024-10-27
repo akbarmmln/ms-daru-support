@@ -37,6 +37,13 @@ exports.createMqttConnection = async function (clientId) {
         logger.infoWithContext(`Received message from topic ${receivedTopic}: ${packets}`);
       });
   
+      client.on('error', function (err) {
+        logger.errorWithContext({ error: err, message: `error accoures...` });
+        if (err.code == "ENOTFOUND") {
+          logger.infoWithContext(`Network error, make sure you have an active internet connection`)
+        }
+      })
+  
       return client;
     } else {
       return client;
@@ -53,7 +60,7 @@ exports.addSubscription = async function (clientId, newTopics, saveTopic) {
   if (client) {
     client.subscribe(newTopics, { qos }, (err, granted) => {
       if (err) {
-        logger.errorWithContext({ error: err, message: `subscribe error to topic ${newTopics}` })
+        logger.errorWithContext({ error: err, message: `subscribe error to topic` })
       } else {
         createSqlLoket(saveTopic);
         logger.infoWithContext(`Subscribe success to topic ${granted.map(grant => grant.topic)}`)
