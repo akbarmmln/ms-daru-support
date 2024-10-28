@@ -2,6 +2,7 @@ const logger = require('../config/logger');
 const errMsg = require('../error/resError');
 const BaseError = require('../error/baseError');
 const httpCaller = require('../config/httpCaller');
+const crypto = require('node:crypto');
 
 exports.returnErrorFunction = function (resObject, errorMessageLogger, errorObject) {
   if (errorObject instanceof BaseError) {
@@ -35,3 +36,18 @@ exports.verifyTokenMs = async function (req, res, next) {
     return res.status(401).json(e?.response?.data);
   }
 }
+
+exports.scramble = async function (a) {
+  let d;
+  a = a.split('');
+  for (let b = a.length - 1; b > 0; b--) {
+    const array = new Uint32Array(1);
+    const randomValue = crypto.randomFillSync(array)[0];
+    const c = Math.floor((randomValue / (0xFFFFFFFF + 1)) * (b + 1));
+    
+    d = a[b];
+    a[b] = a[c];
+    a[c] = d;
+  }
+  return a.join('');
+};
