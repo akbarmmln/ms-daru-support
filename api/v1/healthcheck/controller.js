@@ -70,15 +70,3 @@ exports.coba = async function (req, res) {
         return res.status(500).json(errMsg('01000'));
     }
 }
-
-exports.seatSelection = async function(req, res) {
-    try {
-        const hasil = {
-            'denah': ['A', 'B', '-', 'C', 'D']
-        }
-        return res.status(200).json(rsMsg('000000', hasil));
-    } catch (e) {
-        logger.errorWithContext({ error: e, message: 'error GET /api/v1/healthcheck/seat-selection...' });
-        return utils.returnErrorFunction(res, 'error GET /api/v1/healthcheck/seat-selection...', e);
-    }
-}
