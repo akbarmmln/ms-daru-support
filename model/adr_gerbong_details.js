@@ -4,7 +4,7 @@ const moment = require('moment');
 
 const adrGerbongDetails = dbConnection.define('adr_gerbong_details', {
   id: {
-    type: Sequelize.STRING,
+    type: Sequelize.INTEGER,
     primaryKey: true
   },
   created_dt: Sequelize.DATE(6),
