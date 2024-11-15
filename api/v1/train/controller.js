@@ -53,7 +53,6 @@ exports.available = async function (req, res) {
     return utils.returnErrorFunction(res, 'error POST /api/v1/train/ticket/available...', e);
   }
 }
-
 exports.checkSeats = async function (req, res) {
   try {
     const id_kereta = req.params.id;
