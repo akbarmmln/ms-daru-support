@@ -54,7 +54,7 @@ exports.available = async function (req, res) {
   }
 }
 
-exports.details = async function (req, res) {
+exports.checkSeats = async function (req, res) {
   try {
     const id_kereta = req.params.id;
 

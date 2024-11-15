@@ -5,6 +5,6 @@ const utils = require('../../../utils/utils');
 
 router.post('/available', controller.available);
 
-router.get('/check-seat/:id', controller.details);
+router.get('/check-seat/:id', controller.checkSeats);
 
 module.exports = router;
