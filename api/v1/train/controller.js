@@ -58,7 +58,7 @@ exports.checkSeats = async function (req, res) {
   try {
     const id_kereta = req.params.id;
 
-    const data = await adrKereta.findAll({
+    const data = await adrKereta.findOne({
       include: [{
         model: adrGerbongKereta,
         required: true,
