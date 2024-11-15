@@ -41,15 +41,42 @@ exports.available = async function (req, res) {
       return acc;
     }, []);
 
-    for(let j=0; j<result.length; j++) {
+    for (let j = 0; j < result.length; j++) {
       const targetIdKereta = result[j].id_kereta
       const count = data.filter(item => item.id_kereta === targetIdKereta && item.status === 1).length;
       result[j].sisa_kursi = count
     }
-    
+
     return res.status(200).json(rsmg('000000', result));
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/train/ticket/available...' });
     return utils.returnErrorFunction(res, 'error POST /api/v1/train/ticket/available...', e);
+  }
+}
+
+exports.details = async function (req, res) {
+  try {
+    const id_kereta = req.params.id;
+
+    const data = await adrKereta.findAll({
+      include: [{
+        model: adrGerbongKereta,
+        required: true,
+        as: 'gerbong',
+        include: [
+          {
+            model: adrGerbongDetails,
+            required: true,
+            as: 'gerbongDetails'
+          }
+        ]
+      }],
+      where: sequelize.literal(`adr_kereta.id = '${id_kereta}'`)
+    })
+
+    return res.status(200).json(rsmg('000000', data))
+  } catch (e) {
+    logger.errorWithContext({ error: e, message: 'error GET /api/v1/train/ticket/details/:id...' });
+    return utils.returnErrorFunction(res, 'error GET /api/v1/train/ticket/details/:id...', e);
   }
 }

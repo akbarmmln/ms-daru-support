@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const dbConnection = require('../config/db').Sequelize;
 const moment = require('moment');
+const adrGerbongDetails = require('../model/adr_gerbong_details');
 
 const adrGerbongKereta = dbConnection.define('adr_gerbong_kereta', {
   id: {
@@ -22,5 +23,7 @@ const adrGerbongKereta = dbConnection.define('adr_gerbong_kereta', {
   timestamps: false,
   tableName: 'adr_gerbong_kereta'
 });
+
+adrGerbongKereta.hasMany(adrGerbongDetails, { foreignKey: 'id_gerbong', as: 'gerbongDetails' });
 
 module.exports = adrGerbongKereta;
