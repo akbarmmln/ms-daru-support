@@ -7,4 +7,6 @@ router.post('/available', utils.verifyTokenMs, controller.available);
 
 router.get('/check-seat/:id', utils.verifyTokenMs, controller.checkSeats);
 
+router.post('/socket/publish', controller.socketPublish);
+
 module.exports = router;

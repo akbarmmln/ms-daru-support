@@ -13,6 +13,7 @@ const adrGerbongKereta = require('../../../model/adr_gerbong_kereta')
 const adrGerbongDetails = require('../../../model/adr_gerbong_details')
 const dbConnection = require('../../../config/db').Sequelize;
 const sequelize = require('sequelize');
+const { getWebSocket, WebSocket } = require('../../../config/websocket');
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
@@ -76,7 +77,28 @@ exports.checkSeats = async function (req, res) {
 
     return res.status(200).json(rsmg('000000', data))
   } catch (e) {
-    logger.errorWithContext({ error: e, message: 'error GET /api/v1/train/ticket/details/:id...' });
-    return utils.returnErrorFunction(res, 'error GET /api/v1/train/ticket/details/:id...', e);
+    logger.errorWithContext({ error: e, message: 'error GET /api/v1/train/check-seat/:id...' });
+    return utils.returnErrorFunction(res, 'error GET /api/v1/train/check-seat/:id...', e);
+  }
+}
+
+exports.socketPublish = async function (req, res) {
+  try {
+    const target_client_id = req.body.target_client_id;
+    const pesan = req.body.pesan;
+
+    const ws = getWebSocket();
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      const payload = {
+        type: 'message',
+        targetClientId: target_client_id,
+        payload: pesan
+      }
+      ws.send(JSON.stringify(payload));
+    }
+    return res.status(200).json(rsmg('000000'))
+  } catch (e) {
+    logger.errorWithContext({ error: e, message: 'error GET /api/v1/train/coba...' });
+    return utils.returnErrorFunction(res, 'error GET /api/v1/train/coba...', e);
   }
 }
