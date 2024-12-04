@@ -2,7 +2,7 @@
 require('dotenv').config();
 const app = require('./app');
 const logger = require('./config/logger');
-const { connectClientWS } = require('./config/websocket');
+// const { connectClientWS } = require('./config/websocket');
 // const mqttConfig = require('./config/mqtt');
 
 // connectClientWS();
