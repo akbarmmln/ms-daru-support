@@ -1,10 +1,22 @@
 const WebSocket = require("ws");
-const clientId = 'serviceA';
-const wsUrl = 'wss://ms-websocket-production.up.railway.app';
+let clientId;
+const wsUrl = process.env.SOCKET;
 let reconnectDelay = 5000;
 let wsInstance = null;
 const logger = require('./logger');
 
+async function init() {
+    clientId = await runNanoID(10);
+}
+
+async function runNanoID(n) {
+    const { customAlphabet } = await import('nanoid');
+    const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
+    const id = customAlphabet(alphabet, n);
+    return `socket-server-${id()}`;
+}
+
+  
 function connectClientWS() {
     function connect() {
         wsInstance = new WebSocket(wsUrl);
@@ -42,6 +54,7 @@ function connectClientWS() {
             wsInstance.pong();
         });    
     }
+    init();
     connect();
     return wsInstance;
 }
@@ -50,5 +63,5 @@ module.exports = {
     connectClientWS,
     getWebSocket: () => wsInstance,
     WebSocket,
-    clientId,
+    clientId: () => clientId,
 };
