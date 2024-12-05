@@ -39,7 +39,7 @@ function connectClientWS() {
         wsInstance.on('error', (err) => {
             // Graceful handling: Close the connection to trigger reconnect logic
             logger.errorWithContext({ error: err, message: `WebSocket error ${clientId}`})
-            ws.close();
+            wsInstance.close();
         });
 
         wsInstance.on('close', (code, reason) => {
