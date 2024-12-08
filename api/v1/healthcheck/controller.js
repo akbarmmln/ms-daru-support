@@ -41,18 +41,3 @@ async function updateHealthResponse() {
     return 500
   }
 }
-
-const redisClient = require('../../../config/redis');
-exports.coba = async function (req, res) {
-  try {
-    const targetClient = await redisClient.hget('available_socket', 'ms-support-1');
-    let hasil;
-    if (targetClient) {
-      hasil = JSON.parse(targetClient);
-    }
-    return res.status(200).json(rsMsg('000000', hasil))
-  } catch (e) {
-    console.log('errrorrr nya ', e)
-    return res.status(200).json(errMsg('10000', 'internal server error', e))
-  }
-}

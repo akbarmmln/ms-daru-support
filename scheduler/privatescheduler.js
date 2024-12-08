@@ -52,7 +52,7 @@ class PrivateScheduler {
 
       scheduler.addSimpleIntervalJob(job)
     } else {
-      console.log('belum bisa dijalanin')
+      logger.infoWithContext('this pod can not running as web socket client (1)')
     }
   }
 }

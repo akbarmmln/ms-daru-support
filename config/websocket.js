@@ -11,7 +11,6 @@ async function init(params) {
     // clientId = await runNanoID(10);
     const key = `${process.env.SERVICE_NAME}-${params}`
     const targetClient = await redisClient.hget('available_socket', `${key}`);
-    console.log(`targetClienttargetClient `, JSON.stringify(targetClient))
     if (targetClient) {
         const hasil = JSON.parse(targetClient);
         clientId = hasil.socketName
@@ -71,7 +70,7 @@ async function connectClientWS(params, podName) {
                 wsInstance.pong();
             });
         } else {
-            logger.infoWithContext('this pod can not running as web socket client')
+            logger.infoWithContext('this pod can not running as web socket client (2)')
         }
     }
     await init(params);
