@@ -1,0 +1,219 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mssupport
+  namespace: sit
+  labels:
+    app: mssupport
+    version: v1
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  minReadySeconds: 60
+  selector:
+    matchLabels:
+      app: mssupport
+  template:
+    metadata:
+      labels:
+        app: mssupport
+        version: v1
+    spec:
+      containers:
+      - name: mssupport
+        image: taufik90/ms-support:6
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8997
+        livenessProbe:
+          httpGet:
+            path: /api/v1/healthcheck/healty
+            port: 8997
+          failureThreshold: 10
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/v1/healthcheck/healty
+            port: 8997
+          failureThreshold: 10
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 30
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 60"]
+        env:
+         - name: ACC_KEY_ID
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: ACC_KEY_ID
+         - name: FIREBASE_CLIENT_EMAIL
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: FIREBASE_CLIENT_EMAIL
+         - name: FIREBASE_DB_URL
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: FIREBASE_DB_URL
+         - name: FIREBASE_PRIVATE_KEY
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: FIREBASE_PRIVATE_KEY
+         - name: FIREBASE_PROJECT_ID
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: FIREBASE_PROJECT_ID
+         - name: HOST_MAIL
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: HOST_MAIL
+         - name: LOGGER_LEVEL
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: LOGGER_LEVEL
+         - name: MS_AUTH_V1_URL
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: MS_AUTH_V1_URL
+         - name: MYSQL_DATABASE
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: MYSQL_DATABASE
+         - name: MYSQL_HOSTNAME
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: MYSQL_HOSTNAME
+         - name: MYSQL_PASSWORD
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: MYSQL_PASSWORD
+         - name: MYSQL_PORT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: MYSQL_PORT
+         - name: MYSQL_USERNAME
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: MYSQL_USERNAME
+         - name: OSS_ENDPOINT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: OSS_ENDPOINT
+         - name: OSS_REGION
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: OSS_REGION
+         - name: PASS_MAIL
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: PASS_MAIL
+         - name: PORT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: PORT
+         - name: PORT_MAIL
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: PORT_MAIL
+         - name: SCR_ACC_KEY
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: SCR_ACC_KEY
+         - name: SECRET
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: SECRET
+         - name: SERVICE_NAME
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: SERVICE_NAME
+         - name: SSL_SEQUELIZE
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: SSL_SEQUELIZE
+         - name: USER_MAIL
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: USER_MAIL
+         - name: REDIS_HOST
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: REDIS_HOST
+         - name: REDIS_PORT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: REDIS_PORT
+         - name: REDIS_PASSWORD
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: REDIS_PASSWORD
+         - name: USR_MQTT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: USR_MQTT
+         - name: PASS_MQTT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: PASS_MQTT
+         - name: HOST_MQTT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: HOST_MQTT
+         - name: HOST_MQTT_NEW
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: HOST_MQTT_NEW
+         - name: CA_CERT_MQTT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: CA_CERT_MQTT
+         - name: CA_CERT_MQTT_NEW
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: CA_CERT_MQTT_NEW
+         - name: SOCKET
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: SOCKET

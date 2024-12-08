@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssupport
+  namespace: sit
+  labels:
+    app: mssupport
+spec:
+  selector:
+    app: mssupport
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8997
