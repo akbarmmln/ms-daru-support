@@ -61,8 +61,8 @@ async function connectClientWS(params, podName) {
             wsInstance.on('close', (code, reason) => {
                 // Retry after a delay
                 logger.infoWithContext(`WebSocket connection closed. Code: ${code}, Reason: ${reason}`)
-                logger.infoWithContext(`Retrying connection in ${reconnectDelay / 1000} seconds...`);
-                setTimeout(connect, reconnectDelay);
+                // logger.infoWithContext(`Retrying connection in ${reconnectDelay / 1000} seconds...`);
+                // setTimeout(connect, reconnectDelay);
             });
     
             wsInstance.on('ping', () => {
