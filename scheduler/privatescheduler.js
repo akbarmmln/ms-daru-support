@@ -24,7 +24,8 @@ class PrivateScheduler {
           {
             workerData: {
               topic: topic,
-              id: result.posititon,
+              id: 1,
+              data: result.posititon
             }
           })
         worker.once("message", result => {

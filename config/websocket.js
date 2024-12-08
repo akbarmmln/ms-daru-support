@@ -16,8 +16,9 @@ async function runNanoID(n) {
     return `socket-server-${id()}`;
 }
 
-async function connectClientWS() {
+async function connectClientWS(params) {
     function connect() {
+        console.log('params nyaaaaa ', params)
         wsInstance = new WebSocket(wsUrl);
 
         wsInstance.on('open', () => {
