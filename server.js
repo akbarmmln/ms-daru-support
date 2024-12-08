@@ -2,12 +2,14 @@
 require('dotenv').config();
 const app = require('./app');
 const logger = require('./config/logger');
+const scheduler = require('./scheduler/index').getInstance();
 // const { connectClientWS } = require('./config/websocket');
-const { getClientSocket } = require('./config/baru');
+// const { getClientSocket } = require('./config/baru');
 // const mqttConfig = require('./config/mqtt');
 
 // connectClientWS();
-getClientSocket();
+// getClientSocket();
+scheduler.getSCID();
 const PORT = process.env.PORT;
 const server = app.listen(PORT, () => logger.infoWithContext(`API Server started. Listening on port:${PORT}`));
 // mqttConfig.mqttForCreateLoker();
