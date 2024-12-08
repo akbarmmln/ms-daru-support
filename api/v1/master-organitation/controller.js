@@ -16,6 +16,7 @@ const HttpStatusCode = require("../../../error/httpStatusCode");
 const Sequelize = require('sequelize');
 const httpCaller = require('../../../config/httpCaller');
 const xlsx = require('xlsx');
+const s3 = require('../../../config/oss').client;
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
@@ -359,5 +360,34 @@ exports.inputCheckFile = async function (req, res) {
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/input/cek-file...' });
     return utils.returnErrorFunction(res, 'error POST /api/v1/master-organitation/input/cek-file...', e);
+  }
+}
+
+async function fileTypeFromBuffer(buffer) {
+  const { fileTypeFromBuffer } = await import('file-type')
+  return await fileTypeFromBuffer(buffer)
+}
+
+exports.listBuckets = async function (req, res) {
+  try {
+    let upload = await s3.listBuckets().promise();
+
+    // let file = req.body.file;
+    // let buf = Buffer.from(file, 'base64')
+    // let filetype = await fileTypeFromBuffer(buf);
+    // let ext = filetype.ext;
+    // let mime = filetype.mime;
+    // let upload = await s3.upload({
+    //     ACL: 'public-read',
+    //     Bucket: 'bucket-sit-4yrlg',
+    //     Key: `${await runNanoID(10)}.${ext}`,
+    //     Body: buf,
+    //     ContentEncoding: 'base64',
+    //     ContentType: mime,
+    // }).promise();
+    return res.status(200).json(rsmg('000000', upload));
+  } catch (e) {
+    logger.errorWithContext({ error: e, message: 'error POST /api/v1/master-organitation/list-bucket...' });
+    return utils.returnErrorFunction(res, 'error POST /api/v1/master-organitation/list-bucket...', e);
   }
 }

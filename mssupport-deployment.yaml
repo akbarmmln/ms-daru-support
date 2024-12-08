@@ -217,3 +217,18 @@ spec:
             secretKeyRef:
               name: mssupport-secret
               key: SOCKET
+         - name: NAMESPACE
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: NAMESPACE
+         - name: ENVIRONMENT
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: ENVIRONMENT
+         - name: SELECTOR
+           valueFrom:
+            secretKeyRef:
+              name: mssupport-secret
+              key: SELECTOR

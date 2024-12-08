@@ -11,5 +11,6 @@ router.get('/config-tahun', utils.verifyTokenMs, controller.getConfigTahun);
 router.post('/input/cek-file', utils.verifyTokenMs, controller.inputCheckFile);
 
 router.get('/:id', controller.getDataMaster);
+router.post('/list-bucket', controller.listBuckets);
 
 module.exports = router;
