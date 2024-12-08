@@ -17,7 +17,7 @@ async function runNanoID(n) {
 }
 
 async function connectClientWS(params) {
-    function connect() {
+    async function connect() {
         console.log('params nyaaaaa ', params)
         wsInstance = new WebSocket(wsUrl);
 
@@ -54,8 +54,8 @@ async function connectClientWS(params) {
             wsInstance.pong();
         });    
     }
-    init();
-    connect();
+    await init();
+    await connect();
     return wsInstance;
 }
 
