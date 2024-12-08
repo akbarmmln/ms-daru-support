@@ -32,6 +32,7 @@ class Assignor {
       logger.infoWithContext('CANNOT RUN AS WEB SOCKET CLIENT');
       return {
         state: false,
+        podName: null,
         posititon: null
       };
     } else {
@@ -87,12 +88,14 @@ class Assignor {
         }
         return {
             state: true,
+            podName: currentPod,
             posititon: position
         };
       } catch (error) {
         logger.errorWithContext({ error, message: 'Error get Assigned Partitions (for running web socket client)' });
         return {
             state: false,
+            podName: null,
             posititon: null
         };
       }

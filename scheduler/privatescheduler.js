@@ -17,7 +17,6 @@ class PrivateScheduler {
     
     await this.initialize();
     const result = await this.#assignorScid.getAssignedPartition();
-    console.log('resultasasasssssss ', JSON.stringify(result))
     if (result.state) {
       const task = new Task(topic, () => {
         let worker = new Worker("./scheduler/websocket/index.js",
@@ -25,7 +24,8 @@ class PrivateScheduler {
             workerData: {
               topic: topic,
               id: 1,
-              data: result.posititon
+              part: result.posititon,
+              podName: result.podName
             }
           })
         worker.once("message", result => {
@@ -45,7 +45,8 @@ class PrivateScheduler {
 
       const job = new SimpleIntervalJob(
         {
-          milliseconds: parseInt(86400254),
+          // milliseconds: parseInt(86400254),
+          milliseconds: parseInt(30561),
           runImmediately: true
         }, task)
 
