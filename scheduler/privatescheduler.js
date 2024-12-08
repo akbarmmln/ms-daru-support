@@ -33,11 +33,11 @@ class PrivateScheduler {
         });
         worker.once("error", result => {
           logger.infoWithContext(`${topic} (on error) Payload Result ${JSON.stringify(result)}`);
-          startVoidWorker[i].terminate();
+          worker[i].terminate();
         });
         worker.once("exit", result => {
           logger.infoWithContext(`${topic} (on exit) Payload Result ${JSON.stringify(result)}`);
-          startVoidWorker[i].terminate();
+          worker[i].terminate();
         });
 
       });
