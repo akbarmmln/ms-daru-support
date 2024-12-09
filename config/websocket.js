@@ -6,24 +6,24 @@ let wsInstance = null;
 const logger = require('./logger');
 const format = require('../config/format');
 const redisClient = require('../config/redis');
+const Constant = require('../utils/constant');
 
 async function init(params) {
-    // clientId = await runNanoID(10);
     const key = `${process.env.SERVICE_NAME}-${params}`
-    const targetClient = await redisClient.hget('available_socket', `${key}`);
-    if (targetClient) {
-        const hasil = JSON.parse(targetClient);
-        clientId = hasil.socketName
+    const data = await redisClient.get(Constant.formatNameRedis(Constant.Constant.REDIS.WEBSOCKET_CLIENT, 'microservice', `${key}`));
+    if (!format.isEmpty(data)) {
+        logger.infoWithContext(`this client ${key} already connect as web service client with detail data ${JSON.parse(data)}`)
+        return false;
     } else {
-        clientId = null;
+        const targetClient = await redisClient.hget('available_socket', `${key}`);
+        if (targetClient) {
+            const hasil = JSON.parse(targetClient);
+            clientId = hasil.socketName
+        } else {
+            clientId = null;
+        }    
+        return true;
     }
-}
-
-async function runNanoID(n) {
-    const { customAlphabet } = await import('nanoid');
-    const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
-    const id = customAlphabet(alphabet, n);
-    return `socket-server-${id()}`;
 }
 
 async function connectClientWS(params, podName) {
@@ -73,9 +73,11 @@ async function connectClientWS(params, podName) {
             logger.infoWithContext('this pod can not running as web socket client (2)')
         }
     }
-    await init(params);
-    await connect();
-    return wsInstance;
+    const hash = await init(params);
+    if (hash) {
+        await connect();
+        return wsInstance;
+    }
 }
 
 module.exports = {
