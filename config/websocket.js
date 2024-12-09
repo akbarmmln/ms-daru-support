@@ -7,6 +7,8 @@ const logger = require('./logger');
 const format = require('../config/format');
 const redisClient = require('../config/redis');
 const Constant = require('../utils/constant');
+const clients = require('./config/clients');
+global.key_client = null;
 
 async function init(params) {
     const key = `${process.env.SERVICE_NAME}-${params}`
@@ -19,6 +21,7 @@ async function init(params) {
         if (targetClient) {
             const hasil = JSON.parse(targetClient);
             clientId = hasil.socketName
+            global.key_client = clientId;
         } else {
             clientId = null;
         }    
@@ -38,8 +41,9 @@ async function connectClientWS(params, podName) {
                     service: `${process.env.SERVICE_NAME}`,
                     podsName: podName,
                     pods: params,
-                    socketName: clientId            
+                    socketName: clientId
                 }
+                clients.set(clientId, wsInstance);
                 wsInstance.send(JSON.stringify({ type: 'register', agent: 'microservice', clientId, additonal: additonal }));
             });
     

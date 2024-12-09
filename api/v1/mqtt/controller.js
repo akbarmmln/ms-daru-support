@@ -127,17 +127,13 @@ function endClientMqtt(client) {
   });
 }
 
-const redisClient = require('../../../config/redis');
-const Constant = require('../../../utils/constant');
-
 exports.removeClientID = async function(req, res) {
   try{
-    const data = await redisClient.get(Constant.formatNameRedis(Constant.Constant.REDIS.WEBSOCKET_CLIENT, 'microservice', `ms-support-0`));
-    // const client_id = req.body.client_id;
-    // const client = global.clients.find(client => client.clientId === client_id);
-    // if (client) {
-    //   await endClientMqtt(client.clientData);
-    // }
+    const client_id = req.body.client_id;
+    const client = global.clients.find(client => client.clientId === client_id);
+    if (client) {
+      await endClientMqtt(client.clientData);
+    }
     return res.status(200).json(rsmg('000000', data))
   }catch(e){
     logger.errorWithContext({ error: e, message: 'error' });
