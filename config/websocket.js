@@ -12,7 +12,7 @@ async function init(params) {
     const key = `${process.env.SERVICE_NAME}-${params}`
     const data = await redisClient.get(Constant.formatNameRedis(Constant.Constant.REDIS.WEBSOCKET_CLIENT, 'microservice', `${key}`));
     if (!format.isEmpty(data)) {
-        logger.infoWithContext(`this client ${key} already connect as web service client with detail data ${JSON.parse(data)}`)
+        logger.infoWithContext(`this client ${key} already connect as web service client with detail data ${data}`)
         return false;
     } else {
         const targetClient = await redisClient.hget('available_socket', `${key}`);
