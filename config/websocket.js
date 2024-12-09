@@ -6,26 +6,15 @@ let wsInstance = null;
 const logger = require('./logger');
 const format = require('../config/format');
 const redisClient = require('../config/redis');
-const Constant = require('../utils/constant');
-const clients = require('../config/clients');
-global.key_client = null;
 
 async function init(params) {
     const key = `${process.env.SERVICE_NAME}-${params}`
-    const data = await redisClient.get(Constant.formatNameRedis(Constant.Constant.REDIS.WEBSOCKET_CLIENT, 'microservice', `${key}`));
-    if (!format.isEmpty(data)) {
-        logger.infoWithContext(`this client ${key} already connect as web service client with detail data ${data}`)
-        return false;
+    const targetClient = await redisClient.hget('available_socket', `${key}`);
+    if (targetClient) {
+        const hasil = JSON.parse(targetClient);
+        clientId = hasil.socketName
     } else {
-        const targetClient = await redisClient.hget('available_socket', `${key}`);
-        if (targetClient) {
-            const hasil = JSON.parse(targetClient);
-            clientId = hasil.socketName
-            global.key_client = clientId;
-        } else {
-            clientId = null;
-        }    
-        return true;
+        clientId = null;
     }
 }
 
@@ -43,7 +32,6 @@ async function connectClientWS(params, podName) {
                     pods: params,
                     socketName: clientId
                 }
-                clients.set(clientId, wsInstance);
                 wsInstance.send(JSON.stringify({ type: 'register', agent: 'microservice', clientId, additonal: additonal }));
             });
     
@@ -77,11 +65,9 @@ async function connectClientWS(params, podName) {
             logger.infoWithContext('this pod can not running as web socket client (2)')
         }
     }
-    const hash = await init(params);
-    if (hash) {
-        await connect();
-        return wsInstance;
-    }
+    await init(params);
+    await connect();
+    return wsInstance;
 }
 
 module.exports = {
