@@ -58,5 +58,8 @@
         "ws": "^8.18.0",
         "xlsx": "^0.18.5",
         "yarn": "^1.22.21"
+    },
+    "overrides": {
+        "@smithy/property-provider": "3.1.10"
     }
 }
