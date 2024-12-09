@@ -14,7 +14,7 @@ const adrGerbongDetails = require('../../../model/adr_gerbong_details')
 const dbConnection = require('../../../config/db').Sequelize;
 const sequelize = require('sequelize');
 const clients = require('../../../config/clients');
-// const { getWebSocket, WebSocket } = require('../../../config/websocket');
+const { WebSocket } = require('../../../config/websocket');
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
