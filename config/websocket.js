@@ -7,7 +7,7 @@ const logger = require('./logger');
 const format = require('../config/format');
 const redisClient = require('../config/redis');
 const Constant = require('../utils/constant');
-const clients = require('./config/clients');
+const clients = require('../config/clients');
 global.key_client = null;
 
 async function init(params) {
