@@ -40,7 +40,7 @@ async function connectClientWS(params, podName) {
                     pods: params,
                     socketName: clientId            
                 }
-                wsInstance.send(JSON.stringify({ type: 'register', clientId, additonal: additonal }));
+                wsInstance.send(JSON.stringify({ type: 'register', agent: 'microservice', clientId, additonal: additonal }));
             });
     
             wsInstance.on('message', (message) => {
