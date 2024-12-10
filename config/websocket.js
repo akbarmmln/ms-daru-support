@@ -6,20 +6,24 @@ let wsInstance = null;
 const logger = require('./logger');
 const format = require('../config/format');
 const redisClient = require('../config/redis');
-const { ToadScheduler, SimpleIntervalJob, Task } = require('toad-scheduler');
 
 async function init(params) {
+    // clientId = await runNanoID(10);
     const key = `${process.env.SERVICE_NAME}-${params}`
     const targetClient = await redisClient.hget('available_socket', `${key}`);
     if (targetClient) {
         const hasil = JSON.parse(targetClient);
         clientId = hasil.socketName
-
-        const scheduler = new ToadScheduler();
-        scheduler.stopById('getSCID')
     } else {
         clientId = null;
     }
+}
+
+async function runNanoID(n) {
+    const { customAlphabet } = await import('nanoid');
+    const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
+    const id = customAlphabet(alphabet, n);
+    return `socket-server-${id()}`;
 }
 
 async function connectClientWS(params, podName) {
@@ -34,7 +38,7 @@ async function connectClientWS(params, podName) {
                     service: `${process.env.SERVICE_NAME}`,
                     podsName: podName,
                     pods: params,
-                    socketName: clientId
+                    socketName: clientId            
                 }
                 wsInstance.send(JSON.stringify({ type: 'register', agent: 'microservice', clientId, additonal: additonal }));
             });
@@ -79,4 +83,3 @@ module.exports = {
     getWebSocket: () => wsInstance,
     WebSocket,
     clientId: () => clientId,
-};
