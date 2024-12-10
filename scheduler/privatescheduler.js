@@ -41,7 +41,6 @@ class PrivateScheduler {
           logger.infoWithContext(`${topic} (on exit) Payload Result ${JSON.stringify(result)}`);
           worker.terminate();
         });
-        scheduler.stop();
       });
 
       const job = new SimpleIntervalJob(
