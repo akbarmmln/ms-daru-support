@@ -14,6 +14,7 @@ const adrGerbongDetails = require('../../../model/adr_gerbong_details')
 const dbConnection = require('../../../config/db').Sequelize;
 const sequelize = require('sequelize');
 const { WebSocket } = require('../../../config/websocket');
+const client = require('../../../config/client');
 
 exports.available = async function (req, res) {
   try {
@@ -75,7 +76,6 @@ exports.checkSeats = async function (req, res) {
   }
 }
 
-const client = require('../../../config/client');
 exports.socketPublish = async function (req, res) {
   try {
     const clientArray = Array.from(client.keys());
@@ -84,9 +84,7 @@ exports.socketPublish = async function (req, res) {
     logger.infoWithContext(`clientArray2: ${clientArray[0]}`);
     console.log(`clientArray3: ${clientArray}`)
 
-    const targetWs = client.get(clientArray[0]);
-    logger.infoWithContext(`targetWs ${targetWs}`)
-
+    const ws = client.get(clientArray[0]);
     const target_client_id = req.body.target_client_id;
     const pesan = req.body.pesan;
 

@@ -15,7 +15,6 @@ exports.connectClientSocket = async function (params, podName) {
       const clientId = hasil.socketName
 
       const connectionDetails = await connectClientWS(params, podName, clientId);
-      console.log('asdsadkaskdsadasd ', connectionDetails)
       clients.set(clientId, connectionDetails)
     } else {
       logger.infoWithContext('this pod can not running as web socket client (2)')
