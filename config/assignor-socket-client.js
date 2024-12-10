@@ -41,7 +41,6 @@ class Assignor {
         const namespace = process.env.NAMESPACE;
         const response = await this.client.listNamespacedPod(namespace, undefined, undefined, undefined, undefined, `app=${process.env.SELECTOR}`);
         const pods = response.body.items;
-        console.log('asdasdasdasd', pods)
         const currentPod = this.getIdentifier();
         if (currentPod === "") {
           throw new Error("Invalid POD name - Unset");

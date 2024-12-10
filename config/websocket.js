@@ -19,7 +19,6 @@ async function init(params) {
 }
 
 async function connectClientWS(params, podName) {
-    logger.infoWithContext(`runnign function connectClientWS`)
     async function connect() {
         if (!format.isEmpty(clientId)) {
             wsInstance = new WebSocket(wsUrl);
