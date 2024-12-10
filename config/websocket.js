@@ -22,7 +22,8 @@ async function connectClientWS(params, podName) {
     async function connect() {
         if (!format.isEmpty(clientId)) {
             wsInstance = new WebSocket(wsUrl);
-
+            global.client = wsInstance
+            
             wsInstance.on('open', () => {
                 // Register clientId
                 logger.infoWithContext(`${clientId} connected to WebSocket server`)
@@ -67,7 +68,6 @@ async function connectClientWS(params, podName) {
     }
     await init(params);
     await connect();
-    global.client = wsInstance
     return wsInstance;
 }
 
