@@ -13,7 +13,7 @@ const adrGerbongKereta = require('../../../model/adr_gerbong_kereta')
 const adrGerbongDetails = require('../../../model/adr_gerbong_details')
 const dbConnection = require('../../../config/db').Sequelize;
 const sequelize = require('sequelize');
-const { getWebSocket, WebSocket } = require('../../../config/websocket');
+const { WebSocket } = require('../../../config/websocket');
 
 exports.available = async function (req, res) {
   try {
@@ -75,21 +75,26 @@ exports.checkSeats = async function (req, res) {
   }
 }
 
+const client = require('../../../config/client');
 exports.socketPublish = async function (req, res) {
   try {
+    const clientArray = Array.from(client.keys());
+    logger.infoWithContext(`asdasdasdad: ${client.size}`);
+    logger.infoWithContext(`clientArray: ${clientArray}`);
+    
     const target_client_id = req.body.target_client_id;
     const pesan = req.body.pesan;
 
-    const ws = getWebSocket();
-    console.log('asdasdasdasdasd', ws)
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      const payload = {
-        type: 'message',
-        targetClientId: target_client_id,
-        payload: pesan
-      }
-      ws.send(JSON.stringify(payload));
-    }
+    // const ws = getWebSocket();
+    // console.log('asdasdasdasdasd', ws)
+    // if (ws && ws.readyState === WebSocket.OPEN) {
+    //   const payload = {
+    //     type: 'message',
+    //     targetClientId: target_client_id,
+    //     payload: pesan
+    //   }
+    //   ws.send(JSON.stringify(payload));
+    // }
     return res.status(200).json(rsmg('000000'))
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error GET /api/v1/train/coba...' });
