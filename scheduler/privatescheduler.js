@@ -19,8 +19,7 @@ class PrivateScheduler {
     
     await this.initialize();
     const result = await this.#assignorScid.getAssignedPartition();
-    // if (result.state) {
-    if (false) {
+    if (result.state) {
       const runTask = () => {
         logger.infoWithContext('init running runTask on getSCID')
         connectClient.connectClientSocket(result.posititon, result.podName);
