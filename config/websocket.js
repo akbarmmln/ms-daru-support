@@ -22,11 +22,13 @@ async function connectClientWS(params, podName) {
     async function connect() {
         if (!format.isEmpty(clientId)) {
             wsInstance = new WebSocket(wsUrl);
-            global.client = wsInstance
-            
+
             wsInstance.on('open', () => {
                 // Register clientId
                 logger.infoWithContext(`${clientId} connected to WebSocket server`)
+                global.client = wsInstance
+
+                logger.infoWithContext(`asdfmadfjksadkasd ${global.client}`)
                 const additonal = {
                     service: `${process.env.SERVICE_NAME}`,
                     podsName: podName,
