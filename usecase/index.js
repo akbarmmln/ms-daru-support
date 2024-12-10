@@ -6,7 +6,7 @@ const format = require('../config/format');
 
 exports.connectClientSocket = async function (params, podName) {
   try {
-    const logggss = connectClientWS(params, podName);
+    const logggss = await connectClientWS(params, podName);
     console.log('asdsadkaskdsadasd ', logggss)
     // const key = `${process.env.SERVICE_NAME}-${params}`
     // const data = await redisClient.get(Constant.formatNameRedis(Constant.Constant.REDIS.WEBSOCKET_CLIENT, 'microservice', `${key}`));
