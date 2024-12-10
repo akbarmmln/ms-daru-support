@@ -67,6 +67,7 @@ async function connectClientWS(params, podName) {
     }
     await init(params);
     await connect();
+    global.client = wsInstance
     return wsInstance;
 }
 
