@@ -8,8 +8,9 @@ exports.connectClientSocket = async function (params, podName) {
   try {
     const key = `${process.env.SERVICE_NAME}-${params}`
     const data = await redisClient.get(Constant.formatNameRedis(Constant.Constant.REDIS.WEBSOCKET_CLIENT, 'microservice', `${key}`));
+    logger.infoWithContext(`detail data client ${data}`)
     if (!format.isEmpty(data)) {
-      logger.infoWithContext(`this client ${key} already connect as web service client with detail data ${data}`)
+      logger.infoWithContext(`this client ${key} already connect as web service client`)
     } else {
       connectClientWS(params, podName);
     }
