@@ -15,13 +15,6 @@ const dbConnection = require('../../../config/db').Sequelize;
 const sequelize = require('sequelize');
 const { getWebSocket, WebSocket } = require('../../../config/websocket');
 
-async function runNanoID(n) {
-  const { customAlphabet } = await import('nanoid');
-  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
-  const id = customAlphabet(alphabet, n);
-  return id();
-}
-
 exports.available = async function (req, res) {
   try {
     const data = await dbConnection.query("SELECT * FROM ms_control_panel.adr_kereta JOIN ms_control_panel.adr_gerbong_kereta " +

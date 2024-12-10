@@ -8,7 +8,6 @@ const format = require('../config/format');
 const redisClient = require('../config/redis');
 
 async function init(params) {
-    // clientId = await runNanoID(10);
     const key = `${process.env.SERVICE_NAME}-${params}`
     const targetClient = await redisClient.hget('available_socket', `${key}`);
     if (targetClient) {
@@ -17,13 +16,6 @@ async function init(params) {
     } else {
         clientId = null;
     }
-}
-
-async function runNanoID(n) {
-    const { customAlphabet } = await import('nanoid');
-    const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
-    const id = customAlphabet(alphabet, n);
-    return `socket-server-${id()}`;
 }
 
 async function connectClientWS(params, podName) {
