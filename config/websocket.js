@@ -1,13 +1,11 @@
 const WebSocket = require("ws");
-let clientId;
 const wsUrl = process.env.SOCKET;
 let reconnectDelay = 5000;
 let wsInstance = null;
 const logger = require('./logger');
-const format = require('../config/format');
 
 async function connectClientWS(params, podName, clientId) {
-    async function connect() {
+    async function connect(params, podName, clientId) {
         wsInstance = new WebSocket(wsUrl);
 
         wsInstance.on('open', () => {
@@ -49,8 +47,7 @@ async function connectClientWS(params, podName, clientId) {
             wsInstance.pong();
         });
     }
-    await init(params);
-    await connect();
+    await connect(params, podName, clientId);
     return wsInstance;
 }
 
