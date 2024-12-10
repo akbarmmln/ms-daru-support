@@ -77,7 +77,7 @@ class Assignor {
 
         // Get POD Position
         let position = -1;
-        names.forEach((value, index) => {
+        unsortedNames.forEach((value, index) => {
           if (value == currentPod) {
             position = index;
           }
