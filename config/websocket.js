@@ -82,4 +82,5 @@ module.exports = {
     connectClientWS,
     getWebSocket: () => wsInstance,
     WebSocket,
-    clientId: () => clientId,
+    clientId: () => clientId
+}
