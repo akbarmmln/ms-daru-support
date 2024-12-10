@@ -48,7 +48,7 @@ class PrivateScheduler {
           // milliseconds: parseInt(86400254),
           milliseconds: parseInt(30561),
           runImmediately: true
-        }, task)
+        }, task, { id: 'getSCID' })
 
       scheduler.addSimpleIntervalJob(job)
     } else {
