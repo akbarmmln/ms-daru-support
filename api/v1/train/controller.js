@@ -82,7 +82,7 @@ exports.socketPublish = async function (req, res) {
     logger.infoWithContext(`asdasdasdad: ${client.size}`);
     logger.infoWithContext(`clientArray1: ${clientArray}`);
     logger.infoWithContext(`clientArray2: ${clientArray[0]}`);
-    console.log(`clientArray3: ${clientArray[0]}`)
+    console.log(`clientArray3: ${clientArray}`)
 
     const targetWs = client.get(clientArray[0]);
     logger.infoWithContext(`targetWs ${targetWs}`)
