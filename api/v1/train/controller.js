@@ -87,7 +87,6 @@ exports.socketPublish = async function (req, res) {
     const target_client_id = req.body.target_client_id;
     const pesan = req.body.pesan;
 
-    const ws = getWebSocket();
     logger.infoWithContext(`connection socket details ${global.client}`)
     
     if (ws && ws.readyState === WebSocket.OPEN) {
