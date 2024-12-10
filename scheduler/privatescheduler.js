@@ -45,8 +45,8 @@ class PrivateScheduler {
 
       const job = new SimpleIntervalJob(
         {
-          milliseconds: parseInt(86400254),
-          // milliseconds: parseInt(30561),
+          // milliseconds: parseInt(86400254),
+          milliseconds: parseInt(30561),
           runImmediately: true
         }, task)
 

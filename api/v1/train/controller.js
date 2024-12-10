@@ -13,7 +13,7 @@ const adrGerbongKereta = require('../../../model/adr_gerbong_kereta')
 const adrGerbongDetails = require('../../../model/adr_gerbong_details')
 const dbConnection = require('../../../config/db').Sequelize;
 const sequelize = require('sequelize');
-const { getWebSocket, WebSocket } = require('../../../config/websocket');
+const { waitForWebSocket } = require('../../../config/websocket');
 
 async function runNanoID(n) {
   const { customAlphabet } = await import('nanoid');
@@ -87,8 +87,7 @@ exports.socketPublish = async function (req, res) {
     const target_client_id = req.body.target_client_id;
     const pesan = req.body.pesan;
 
-    logger.infoWithContext(`connection socket details ${global.client}`)
-    
+    const ws = await waitForWebSocket();
     if (ws && ws.readyState === WebSocket.OPEN) {
       const payload = {
         type: 'message',
