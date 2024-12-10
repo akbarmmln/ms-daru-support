@@ -2,6 +2,7 @@ const { connectClientWS } = require('../config/websocket');
 const logger = require('../config/logger');
 const redisClient = require('../config/redis');
 const Constant = require('../utils/constant');
+const format = require('../config/format');
 
 exports.connectClientSocket = async function (params, podName) {
   try {
