@@ -81,10 +81,7 @@ exports.socketPublish = async function (req, res) {
     const clientArray = Array.from(client.keys());
     const ws = client.get(clientArray[0]);
     const target_client_id = req.body.target_client_id;
-    const pesan = req.body.pesan;
-
-    console.log('data informasi koneksi clinet ', ws)
-    
+    const pesan = req.body.pesan;    
     if (ws && ws.readyState === WebSocket.OPEN) {
       const payload = {
         type: 'message',
