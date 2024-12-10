@@ -22,7 +22,7 @@ exports.connectClientSocket = async function (params, podName) {
         logger.infoWithContext('this pod can not running as web socket client (2)')
       }  
     } else {
-      logged.infoWithContext(`this pod already connected as web socket client with detail data : ${logged}`)
+      logger.infoWithContext(`this pod already connected as web socket client with detail data : ${logged}`)
     }
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'failed/error when running function connectClientSocket' })
