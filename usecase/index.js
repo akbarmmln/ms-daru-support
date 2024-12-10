@@ -8,22 +8,25 @@ const clients = require('../config/client');
 exports.connectClientSocket = async function (params, podName) {
   try {
     const key = `${process.env.SERVICE_NAME}-${params}`
-    const logged = await redisClient.get(Constant.formatNameRedis(Constant.Constant.REDIS.WEBSOCKET_CLIENT, 'microservice', `${key}`));
-    if (format.isEmpty(logged)) {
-      const targetClient = await redisClient.hget('available_socket', `${key}`);
-      if (targetClient) {
+    logger.infoWithContext(`connectClientSocket -> params ${params} podName ${podName}`)
+    const targetClient = await redisClient.hget('available_socket', `${key}`);
+    if (targetClient) {
+      const logged = await redisClient.get(Constant.formatNameRedis(Constant.Constant.REDIS.WEBSOCKET_CLIENT, 'microservice', `${key}`));
+      if (format.isEmpty(logged)) {
         logger.infoWithContext('this pod will be running as web socket client (2)')
         const hasil = JSON.parse(targetClient);
         const clientId = hasil.socketName
   
         const connectionDetails = await connectClientWS(params, podName, clientId);
-        clients.set(clientId, connectionDetails)
+        clients.set(clientId, connectionDetails)  
       } else {
-        logger.infoWithContext('this pod can not running as web socket client (2)')
-      }  
+        logger.infoWithContext(`this pod already connected as web socket client with detail data : ${logged}`)
+      }
     } else {
-      logger.infoWithContext(`this pod already connected as web socket client with detail data : ${logged}`)
-    }
+      logger.infoWithContext('this pod can not running as web socket client (2)')
+    }  
+
+    
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'failed/error when running function connectClientSocket' })
   }
