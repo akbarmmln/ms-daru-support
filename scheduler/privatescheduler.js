@@ -1,5 +1,6 @@
 const { Worker } = require('worker_threads');
 const { ToadScheduler, SimpleIntervalJob, Task } = require('toad-scheduler');
+const schedule = require('node-schedule');
 const AssignorSCID = require('../config/assignor-socket-client');
 const logger = require('../config/logger');
 const connectClient = require('../usecase/index')
@@ -19,8 +20,14 @@ class PrivateScheduler {
     await this.initialize();
     const result = await this.#assignorScid.getAssignedPartition();
     if (result.state) {
-      connectClient.connectClientSocket(result.posititon, result.podName)
-      
+      const runTask = () => {
+        logger.infoWithContext('init running runTask on getSCID')
+        connectClient.connectClientSocket(result.posititon, result.podName);
+      };
+
+      runTask();
+      schedule.scheduleJob('*/3 * * * *', runTask);
+
       // const task = new Task(topic, () => {
       //   let worker = new Worker("./scheduler/websocket/index.js",
       //     {
