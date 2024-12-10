@@ -89,15 +89,14 @@ exports.socketPublish = async function (req, res) {
     const pesan = req.body.pesan;
 
     // const ws = getWebSocket();
-    // console.log('asdasdasdasdasd', ws)
-    // if (ws && ws.readyState === WebSocket.OPEN) {
-    //   const payload = {
-    //     type: 'message',
-    //     targetClientId: target_client_id,
-    //     payload: pesan
-    //   }
-    //   ws.send(JSON.stringify(payload));
-    // }
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      const payload = {
+        type: 'message',
+        targetClientId: target_client_id,
+        payload: pesan
+      }
+      ws.send(JSON.stringify(payload));
+    }
     return res.status(200).json(rsmg('000000'))
   } catch (e) {
     logger.errorWithContext({ error: e, message: 'error GET /api/v1/train/coba...' });
