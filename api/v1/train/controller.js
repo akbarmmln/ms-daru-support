@@ -80,8 +80,13 @@ exports.socketPublish = async function (req, res) {
   try {
     const clientArray = Array.from(client.keys());
     logger.infoWithContext(`asdasdasdad: ${client.size}`);
-    logger.infoWithContext(`clientArray: ${clientArray}`);
-    
+    logger.infoWithContext(`clientArray1: ${clientArray}`);
+    logger.infoWithContext(`clientArray2: ${clientArray[0]}`);
+    console.log(`clientArray3: ${clientArray[0]}`)
+
+    const targetWs = client.get(clientArray[0]);
+    logger.infoWithContext(`targetWs ${targetWs}`)
+
     const target_client_id = req.body.target_client_id;
     const pesan = req.body.pesan;
 
