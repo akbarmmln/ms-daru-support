@@ -22,7 +22,7 @@ class PrivateScheduler {
     if (result.state) {
       const runTask = () => {
         logger.infoWithContext('init running runTask on getSCID')
-        connectClient.connectClientSocket(result.posititon, result.podName);
+        // connectClient.connectClientSocket(result.posititon, result.podName);
       };
 
       runTask();
